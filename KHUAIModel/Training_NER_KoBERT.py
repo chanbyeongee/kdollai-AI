@@ -7,7 +7,8 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 from seqeval.metrics import f1_score, classification_report
 from tensorflow.keras.utils import to_categorical
 
-from AIKoBERT import TFBertForTokenClassification, get_tokenizer, convert_examples_to_features
+from AIKoBERT import TFBertForTokenClassification, convert_examples_to_features, NER_make_datasets
+from KHUDoll_AIModels import get_converters
 
 train_data = pd.read_csv("C:\MyProjects\Other Projects\AI ChatBot Project/ner_train_data.csv")
 test_data = pd.read_csv("C:\MyProjects\Other Projects\AI ChatBot Project/ner_test_data.csv")
@@ -29,8 +30,12 @@ test_data_sentence = [sent.split() for sent in test_data['Sentence'].values]
 train_data_label = [tag.split() for tag in train_data['Tag'].values]
 test_data_label = [tag.split() for tag in test_data['Tag'].values]
 
+# tokenizer load
+converters = get_converters()
+tokenizer = converters[0]
 # 29개의 개체명 라벨들 load
-labels = [label.strip() for label in open('C:\MyProjects\Other Projects\AI ChatBot Project/ner_label.txt', 'r', encoding='utf-8')]
+labels = converters[4]
+
 print('개체명 태깅 정보 :', labels)
 
 # 개체명 라벨과 정수를 상호 변환할 수 있도록 두 dictionary 정의
@@ -41,12 +46,22 @@ index_to_tag = {index: tag for index, tag in enumerate(labels)}
 tag_size = len(tag_to_index)
 print('개체명 태깅 정보의 개수 :',tag_size)
 
-# tokenizer load
-tokenizer = get_tokenizer()
-
 # 데이터셋 생성
-X_train, y_train = convert_examples_to_features(train_data_sentence, train_data_label, max_seq_len=128, tokenizer=tokenizer, vocab=tag_to_index)
-X_test, y_test = convert_examples_to_features(test_data_sentence, test_data_label, max_seq_len=128, tokenizer=tokenizer, vocab=tag_to_index)
+X_train, y_train = NER_make_datasets(train_data['Sentence'], train_data_label, max_len=128, tokenizer=tokenizer, converter=tag_to_index)
+X_test, y_test = NER_make_datasets(test_data['Sentence'], test_data_label, max_len=128, tokenizer=tokenizer, converter=tag_to_index)
+
+# 최대 길이: 128
+input_id = X_train[0][0]
+attention_mask = X_train[1][0]
+token_type_id = X_train[2][0]
+label = y_train[0]
+
+print('단어에 대한 정수 인코딩 :',input_id)
+print('어텐션 마스크 :',attention_mask)
+print('세그먼트 인코딩 :',token_type_id)
+print('각 인코딩의 길이 :', len(input_id))
+print('정수 인코딩 복원 :',tokenizer.decode(input_id))
+print('레이블 :',label)
 
 # 원핫인코딩
 one_hot_y_train = to_categorical(y_train)
