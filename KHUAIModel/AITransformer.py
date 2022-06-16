@@ -72,8 +72,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
 
         assert d_model % self.num_heads == 0
 
-        # d_model을 num_heads로 나눈 값.
-        # 논문 기준 : 64
+        # d_model을 num_heads로 나눈 값. 논문 기준 : 64
         self.depth = d_model // self.num_heads
 
         # WQ, WK, WV에 해당하는 밀집층 정의

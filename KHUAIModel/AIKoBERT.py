@@ -1,22 +1,19 @@
-from transformers import shape_list, BertTokenizer, TFBertModel
+from transformers import TFBertModel
 import tensorflow as tf
 from tqdm import tqdm
 import numpy as np
 import pickle
+from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 class TFBertForTokenClassification(tf.keras.Model):
     def __init__(self, model_name, labels):
         super(TFBertForTokenClassification, self).__init__()
         # 모델 구조 생성 (64 x 128 x 29)
         self.bert = TFBertModel.from_pretrained(model_name, from_pt=True)
+        self.drop = tf.keras.layers.Dropout(self.bert.config.hidden_dropout_prob)
         self.classifier = tf.keras.layers.Dense(labels,
                                                 kernel_initializer=tf.keras.initializers.TruncatedNormal(0.02),
                                                 name='classifier')
-        # 개체명 사전 파일 load
-        with open('C:\MyProjects\Other Projects\AI ChatBot Project\Training_Model_Weights/NER_RNN/index_to_tag.pickle', 'rb') as f:
-            self.index_to_tag = pickle.load(f)
-        # 사전에 만들어 놓은 BERT Tokenizer load
-        self.tokenizer = get_tokenizer()
 
     def call(self, inputs):
         # encoding input, mask, positional encoding
@@ -27,147 +24,218 @@ class TFBertForTokenClassification(tf.keras.Model):
 
         return prediction
 
-def get_tokenizer():
-    return BertTokenizer.from_pretrained("klue/bert-base")
+class TFBertForSequenceClassification(tf.keras.Model):
+    def __init__(self, model_name, num_labels):
+        super(TFBertForSequenceClassification, self).__init__()
+        self.bert = TFBertModel.from_pretrained(model_name, from_pt=True)
+        self.drop = tf.keras.layers.Dropout(self.bert.config.hidden_dropout_prob)
+        self.classifier = tf.keras.layers.Dense(num_labels,
+                                                kernel_initializer=tf.keras.initializers.TruncatedNormal(self.bert.config.initializer_range),
+                                                activation='softmax',
+                                                name='classifier')
+
+    def call(self, inputs):
+        input_ids, attention_mask, token_type_ids = inputs
+        outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+        output = outputs[1]
+        dropped = self.drop(output, training=False)
+        prediction = self.classifier(dropped)
+
+        return prediction
 
 # 훈련 데이터셋 구조 생성 함수
-def convert_examples_to_features(examples, labels, max_seq_len, tokenizer, vocab, 
-                                 pad_token_id_for_segment=0, pad_token_id_for_label=29):
-    # [CLS], [SEP], [PAD]
-    cls_token = tokenizer.cls_token
-    sep_token = tokenizer.sep_token
-    pad_token_id = tokenizer.pad_token_id
+def NER_make_datasets(sentences, labels, max_len, tokenizer, converter):
 
-    input_ids, attention_masks, token_type_ids, data_labels = [], [], [], []
+  input_ids, attention_masks, token_type_ids, labels_list = [], [], [], []
 
-    for example, label in tqdm(zip(examples, labels), total=len(examples)):
-        tokens = []
-        labels_ids = []
-        for one_word, label_token in zip(example, label):
-            # 단어들을 모두 subword로 분해
-            subword_tokens = tokenizer.tokenize(one_word)
-            tokens.extend(subword_tokens)
-            # 정답들을 정수로 encoding 및 중간중간에 MASK(29)로 채워넣어서 정답데이터 생성
-            labels_ids.extend([vocab[label_token]]+ [pad_token_id_for_label] * (len(subword_tokens) - 1))
+  for sentence, label in zip(sentences, labels):
+    # 문장별로 정수 인코딩 진행
+    input_id = tokenizer.encode(sentence, max_length=max_len)
+    # encode한 정수들의 수만큼 1로 할당
+    attention_mask = [1] * len(input_id)
+    # 입력(문장)이 1개이므로 세그먼트 임베딩의 모든 차원이 0
+    token_type_id = [0] * max_len
+    # label을 정수로 convert
+    indexs = []
+    for one_word, one_label in zip(sentence.split(), label):
+      # label그대로 정답데이터를 만드는 것 보다, 한 단어들 모두 subword로 나뉘어서 인코딩 되므로
+      # 원래 단어 위치에 맞게 label index를 넣어주고, subword로 생긴 자리에는 상관 없는 수(29)를 할당해주면서 정답데이터를 만든게 정답률이 높음
+      sub_words = tokenizer.tokenize(one_word)
+      indexs.extend([converter[one_label]] + [29] * (len(sub_words) - 1))
 
-        # 최대 126차원으로 재배열
-        special_tokens_count = 2
-        if len(tokens) > max_seq_len - special_tokens_count:
-            tokens = tokens[:(max_seq_len - special_tokens_count)]
-            labels_ids = labels_ids[:(max_seq_len - special_tokens_count)]
-        
-        # token은 앞뒤로 [SEP], [CLS]를, label은 [PAD]를 붙여넣음
-        tokens += [sep_token]
-        labels_ids += [pad_token_id_for_label]
-        tokens = [cls_token] + tokens
-        labels_ids = [pad_token_id_for_label] + labels_ids
-        # token 정수 인코딩, attention mask 생성
-        input_id = tokenizer.convert_tokens_to_ids(tokens)
-        attention_mask = [1] * len(input_id)
-        padding_count = max_seq_len - len(input_id)
-        # Padding
-        input_id = input_id + ([pad_token_id] * padding_count)
-        attention_mask = attention_mask + ([0] * padding_count)
-        token_type_id = [pad_token_id_for_segment] * max_seq_len
-        label = labels_ids + ([pad_token_id_for_label] * padding_count)
+    indexs = indexs[:max_len]
 
-        assert len(input_id) == max_seq_len, "Error with input length {} vs {}".format(len(input_id), max_seq_len)
-        assert len(attention_mask) == max_seq_len, "Error with attention mask length {} vs {}".format(len(attention_mask), max_seq_len)
-        assert len(token_type_id) == max_seq_len, "Error with token type length {} vs {}".format(len(token_type_id), max_seq_len)
-        assert len(label) == max_seq_len, "Error with labels length {} vs {}".format(len(label), max_seq_len)
+    input_ids.append(input_id)
+    attention_masks.append(attention_mask)
+    token_type_ids.append(token_type_id)
+    labels_list.append(indexs)
 
-        input_ids.append(input_id)
-        attention_masks.append(attention_mask)
-        token_type_ids.append(token_type_id)
-        data_labels.append(label)
+  # 패딩
+  input_ids = pad_sequences(input_ids, padding='post', maxlen=max_len)
+  attention_masks = pad_sequences(attention_masks, padding='post', maxlen=max_len)
+  labels_list = pad_sequences(labels_list, padding='post', maxlen=max_len, value=29)
 
-    input_ids = np.array(input_ids, dtype=int)
-    attention_masks = np.array(attention_masks, dtype=int)
-    token_type_ids = np.array(token_type_ids, dtype=int)
-    data_labels = np.asarray(data_labels, dtype=np.int32)
+  input_ids = np.array(input_ids, dtype=int)
+  attention_masks = np.array(attention_masks, dtype=int)
+  token_type_ids = np.array(token_type_ids, dtype=int)
+  labels_list = np.asarray(labels_list, dtype=np.int32)
 
-    return (input_ids, attention_masks, token_type_ids), data_labels
+  return (input_ids, attention_masks, token_type_ids), labels_list
 
 # 예측하려는 입력 문장을 BERT 입력 구조로 변환하는 함수
-def convert_examples_to_features_for_prediction(examples, max_seq_len, tokenizer,
-                                 pad_token_id_for_segment=0, pad_token_id_for_label=-1):
-    cls_token = tokenizer.cls_token
-    sep_token = tokenizer.sep_token
-    pad_token_id = tokenizer.pad_token_id
+def NER_make_datasets_for_prediction(sentences, max_len, tokenizer):
 
-    input_ids, attention_masks, token_type_ids, label_masks = [], [], [], []
+  input_ids, attention_masks, token_type_ids, index_positions = [], [], [], []
 
-    for example in tqdm(examples):
-        tokens = []
-        label_mask = []
-        for one_word in example:
-            subword_tokens = tokenizer.tokenize(one_word)
-            tokens.extend(subword_tokens)
-            # label에 Mask인 부분은 -1, 정답이 있는 부분은 0으로 
-            label_mask.extend([0]+ [pad_token_id_for_label] * (len(subword_tokens) - 1))
+  for sentence in sentences:
+    # 문장별로 정수 인코딩 진행
+    input_id = tokenizer.encode(sentence, max_length=max_len)
+    # encode한 정수들의 수만큼 1로 할당
+    attention_mask = [1] * len(input_id)
+    # 입력(문장)이 1개이므로 세그먼트 임베딩의 모든 차원이 0
+    token_type_id = [0] * max_len
+    # label을 정수로 convert
+    indexs = []
+    for one_word in sentence.split():
+      # 하나의 단어가 시작되는 지점을 1, subword로 생긴 자리나, pad된 부분을 29으로 표시한다. 이는 예측된 label의 자리를 나타낸 것이다.
+      sub_words = tokenizer.tokenize(one_word)
+      indexs.extend([1] + [29] * (len(sub_words) - 1))
 
-        special_tokens_count = 2
-        if len(tokens) > max_seq_len - special_tokens_count:
-            tokens = tokens[:(max_seq_len - special_tokens_count)]
-            label_mask = label_mask[:(max_seq_len - special_tokens_count)]
+    indexs = indexs[:max_len]
 
-        tokens += [sep_token]
-        label_mask += [pad_token_id_for_label]
-        tokens = [cls_token] + tokens
-        label_mask = [pad_token_id_for_label] + label_mask
-        input_id = tokenizer.convert_tokens_to_ids(tokens)
-        attention_mask = [1] * len(input_id)
-        padding_count = max_seq_len - len(input_id)
-        input_id = input_id + ([pad_token_id] * padding_count)
-        attention_mask = attention_mask + ([0] * padding_count)
-        token_type_id = [pad_token_id_for_segment] * max_seq_len
-        label_mask = label_mask + ([pad_token_id_for_label] * padding_count)
+    input_ids.append(input_id)
+    attention_masks.append(attention_mask)
+    token_type_ids.append(token_type_id)
+    index_positions.append(indexs)
 
-        assert len(input_id) == max_seq_len, "Error with input length {} vs {}".format(len(input_id), max_seq_len)
-        assert len(attention_mask) == max_seq_len, "Error with attention mask length {} vs {}".format(len(attention_mask), max_seq_len)
-        assert len(token_type_id) == max_seq_len, "Error with token type length {} vs {}".format(len(token_type_id), max_seq_len)
-        assert len(label_mask) == max_seq_len, "Error with labels length {} vs {}".format(len(label_mask), max_seq_len)
+  # 패딩
+  input_ids = pad_sequences(input_ids, padding='post', maxlen=max_len)
+  attention_masks = pad_sequences(attention_masks, padding='post', maxlen=max_len)
+  index_positions = pad_sequences(index_positions, padding='post', maxlen=max_len, value=29)
 
-        input_ids.append(input_id)
-        attention_masks.append(attention_mask)
-        token_type_ids.append(token_type_id)
-        label_masks.append(label_mask)
+  input_ids = np.array(input_ids, dtype=int)
+  attention_masks = np.array(attention_masks, dtype=int)
+  token_type_ids = np.array(token_type_ids, dtype=int)
+  index_positions = np.asarray(index_positions, dtype=np.int32)
 
-    input_ids = np.array(input_ids, dtype=int)
-    attention_masks = np.array(attention_masks, dtype=int)
-    token_type_ids = np.array(token_type_ids, dtype=int)
-    label_masks = np.asarray(label_masks, dtype=np.int32)
+  return (input_ids, attention_masks, token_type_ids), index_positions
 
-    return (input_ids, attention_masks, token_type_ids), label_masks
-
-def ner_prediction(examples, tokenizer, model, vocab, max_seq_len=128):
-  examples = [sent.split() for sent in examples]
+def ner_predict(inputs, tokenizer, model, converter, max_len=128):
   # 입력 데이터 생성
-  X_pred, label_masks = convert_examples_to_features_for_prediction(examples, max_seq_len, tokenizer)
+  input_datas, index_positions = NER_make_datasets_for_prediction(inputs, max_len=max_len, tokenizer=tokenizer)
   # 예측
-  y_predicted = model.predict(X_pred)
+  raw_outputs = model.predict(input_datas)
   # 128 x 29 차원의 원핫 인코딩 형태로 확률 예측값이 나오므로 최댓값만을 뽑아내 128차원 벡터로 변환
-  y_predicted = np.argmax(y_predicted, axis = -1)
+  outputs = np.argmax(raw_outputs, axis = -1)
 
   pred_list = []
   result_list = []
 
-  for i in range(0, len(label_masks)):
+  for i in range(0, len(index_positions)):
     pred_tag = []
-    for label_index, pred_index in zip(label_masks[i], y_predicted[i]):
-    # label이 Mask(-1)인 부분 빼고 정수를 개체명으로 변환
-      if label_index != -1:
-        pred_tag.append(vocab[pred_index])
+    for index_info, output in zip(index_positions[i], outputs[i]):
+    # label이 Mask(29)인 부분 빼고 정수를 개체명으로 변환
+      if index_info != 29:
+        pred_tag.append(converter[output])
 
     pred_list.append(pred_tag)
 
 #   print("\n-----------------------------")
-  for example, pred in zip(examples, pred_list):
-    one_sample_result = []
-    for one_word, label_token in zip(example, pred):
-      one_sample_result.append((one_word, label_token))
-    #   print((one_word, label_token))
-    result_list.append(one_sample_result)
+  for input, preds in zip(inputs, pred_list):
+    result = []
+    for one_word, one_label in zip(input.split(), preds):
+      result.append((one_word, one_label))
+    result_list.append(result)
     # print("-----------------------------")
 
   return result_list
+
+def label_to_index(label):
+  label = label.replace(" ", "")
+  if label == "불만":
+    label = 0
+  elif label == "중립":
+    label = 1
+  elif label == "당혹":
+    label = 2
+  elif label == "기쁨":
+    label = 3
+  elif label == "걱정":
+    label = 4
+  elif label == "질투":
+    label = 5
+  elif label == "슬픔":
+    label = 6
+  elif label == "죄책감":
+    label = 7
+  elif label == "연민":
+    label = 8
+
+  return label
+
+def EMO_make_datasets(sentences, labels, max_len, tokenizer):
+
+    input_ids, attention_masks, token_type_ids, labels_list = [], [], [], []
+    tokenizer.pad_token
+
+    for sentence, label in zip(sentences, labels):
+        # 문장별로 정수 인코딩 진행
+        input_id = tokenizer.encode(sentence, max_length=max_len)
+        # encode한 정수들의 수만큼 1로 할당
+        attention_mask = [1] * len(input_id)
+        # 입력(문장)이 1개이므로 세그먼트 임베딩의 모든 차원이 0
+        token_type_id = [0] * max_len
+
+        input_ids.append(input_id)
+        attention_masks.append(attention_mask)
+        token_type_ids.append(token_type_id)
+        labels_list.append(label)
+
+    # 패딩
+    input_ids = pad_sequences(input_ids, padding='post', maxlen=max_len)
+    attention_masks = pad_sequences(attention_masks, padding='post', maxlen=max_len)
+
+    input_ids = np.array(input_ids, dtype=int)
+    attention_masks = np.array(attention_masks, dtype=int)
+    token_type_ids = np.array(token_type_ids, dtype=int)
+    labels_list = np.asarray(labels_list, dtype=np.int32)
+
+    return (input_ids, attention_masks, token_type_ids), labels_list
+
+def EMO_make_datasets_for_prediction(sentences, max_len, tokenizer):
+
+    input_ids, attention_masks, token_type_ids = [], [], []
+    tokenizer.pad_token
+
+    for sentence in sentences:
+    # 문장별로 정수 인코딩 진행
+        input_id = tokenizer.encode(sentence, max_length=max_len)
+        # encode한 정수들의 수만큼 1로 할당
+        attention_mask = [1] * len(input_id)
+        # 입력(문장)이 1개이므로 세그먼트 임베딩의 모든 차원이 0
+        token_type_id = [0] * max_len
+
+        input_ids.append(input_id)
+        attention_masks.append(attention_mask)
+        token_type_ids.append(token_type_id)
+
+    # 패딩
+    input_ids = pad_sequences(input_ids, padding='post', maxlen=max_len)
+    attention_masks = pad_sequences(attention_masks, padding='post', maxlen=max_len)
+
+    input_ids = np.array(input_ids, dtype=int)
+    attention_masks = np.array(attention_masks, dtype=int)
+    token_type_ids = np.array(token_type_ids, dtype=int)
+
+    return (input_ids, attention_masks, token_type_ids)
+
+def emo_predict(sentences, tokenizer, model, converter, max_len=128):
+
+    # 예측에 필요한 데이터폼 생성
+    input = EMO_make_datasets_for_prediction(sentences, max_len, tokenizer)
+    raw_output = model.predict(input)
+    output = np.argmax(raw_output, axis=-1)
+
+    prediction = converter[output[0]]
+
+    return prediction
