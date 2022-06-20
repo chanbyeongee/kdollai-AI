@@ -46,6 +46,11 @@ index_to_tag = {index: tag for index, tag in enumerate(labels)}
 tag_size = len(tag_to_index)
 print('개체명 태깅 정보의 개수 :',tag_size)
 
+
+#위에는 데이터 불러오기
+
+
+
 # 데이터셋 생성
 X_train, y_train = NER_make_datasets(train_data['Sentence'], train_data_label, max_len=128, tokenizer=tokenizer, converter=tag_to_index)
 X_test, y_test = NER_make_datasets(test_data['Sentence'], test_data_label, max_len=128, tokenizer=tokenizer, converter=tag_to_index)
@@ -66,6 +71,8 @@ print('레이블 :',label)
 # 원핫인코딩
 one_hot_y_train = to_categorical(y_train)
 
+
+#훈련시키기
 # 모델 생성 및 컴파일
 model = TFBertForTokenClassification("klue/bert-base", labels=tag_size+1)
 optimizer = tf.keras.optimizers.Adam(learning_rate=5e-5)
@@ -77,3 +84,4 @@ model.compile(optimizer=optimizer, loss=loss, metrics=[metric])
 model.fit(
     X_train, one_hot_y_train, epochs=2, batch_size=32, validation_split=0.1
 )
+model.save_weights(~~~)

@@ -2,38 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3bead704-435b-41cc-bd2f-cb6491893ae6" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/k-doll-ai-chatbot.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/k-doll-ai-chatbot.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/bertmodels/SequenceClassification.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/bertmodels/TokenClassification.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EmotionRecognizer/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/models/trainning/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EmotionRecognizer/.idea/EmotionRecognizer.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/EmotionRecognizer/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/EmotionRecognizer/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/EmotionRecognizer/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/EmotionRecognizer/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/EmotionRecognizer/.idea/workspace.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/EmotionRecognizer/EmotionRecognizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/tensormodels/EmotionRecognizer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EmotionRecognizer/Encoding.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/tensormodels/Encoding.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EmotionRecognizer/Utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/tensormodels/Utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EmotionRecognizer/WordClassifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/tensormodels/WordClassifier.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EmotionRecognizer/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/tensormodels/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EmotionRecognizer/감성대화말뭉치_최종.csv" beforeDir="false" afterPath="$PROJECT_DIR$/models/tensormodels/감성대화말뭉치_최종.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KHUAIModel/Training_EmoClass_KoBERT.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/trainning/Training_EmoClass_KoBERT.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Temp/Untitled2.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Temp/practice_Naver NER2.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Temp/test_Emotional Conversation Analysis_NLP_PreventOOV.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/KHUAIModel/AIKoBERT.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/bertmodels/AIKoBERT.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/KHUAIModel/AITransformer.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/bertmodels/AITransformer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/KHUAIModel/KHUDoll_AIModels.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/bertmodels/KHUDoll_AIModels.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/KHUAIModel/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/KHUAIModel/Training_Chatbot_Transformer.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/trainning/Training_Chatbot_Transformer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/KHUAIModel/Training_EmoClass_KoBERT.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/KHUAIModel/Training_NER_KoBERT.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/trainning/Training_NER_KoBERT.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/KHUAIModel/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/bertmodels/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/KHUAIModel/main.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/KHUAIModel/test_Chatbot.py" beforeDir="false" afterPath="$PROJECT_DIR$/examples/test_Chatbot.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/KHUAIModel/test_NER.py" beforeDir="false" afterPath="$PROJECT_DIR$/examples/test_NER.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/bertmodels/AIKoBERT.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/bertmodels/AIKoBERT.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/bertmodels/AITransformer.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/bertmodels/AITransformer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/bertmodels/KHUDoll_AIModels.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/bertmodels/KHUDoll_AIModels.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/bertmodels/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/bertmodels/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/trainning/Training_NER_KoBERT.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/trainning/Training_NER_KoBERT.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

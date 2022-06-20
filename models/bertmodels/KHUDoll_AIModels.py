@@ -4,6 +4,12 @@ import pickle
 from collections import OrderedDict
 from transformers import shape_list, BertTokenizer
 
+
+## 가중치만 만들고 불러오는게 안전하다
+
+
+##모델 만들어오는 함수들
+
 def load_general_corpus_model(tokenizer):
     D_MODEL = 256
     NUM_LAYERS = 2
@@ -43,16 +49,21 @@ def load_Emo_model(converter):
 
     return new_model
 
+
+##광명님이 말하는 자료구조로 만들어주는 함수
 def To_DataStructure(input, general_model, NER_model, Emo_model, converters):
     Data = OrderedDict()
     sentence = input[0]
     name = input[1]
+
+    ##컨버터들 , 컨버터는 정수 to tag등...
     tokenizer = converters[0]
     GCtokenizer = converters[1]
     NER_converter = converters[2]
     Emo_converter = converters[3]
 
     GeneralAnswer = predict(sentence, GCtokenizer, general_model)
+    #예측 함수들 모임들
     NEROut = ner_predict([sentence], tokenizer, NER_model, NER_converter)
     EmoOut = emo_predict([sentence], tokenizer, Emo_model, Emo_converter)
 

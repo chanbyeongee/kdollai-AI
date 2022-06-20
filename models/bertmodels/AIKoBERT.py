@@ -1,53 +1,8 @@
-from transformers import TFBertModel
-import tensorflow as tf
-from tqdm import tqdm
 import numpy as np
-import pickle
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
-
-#NER(개체명 인식)
-class TFBertForTokenClassification(tf.keras.Model):
-    def __init__(self, model_name, labels):
-        super(TFBertForTokenClassification, self).__init__()
-        # 모델 구조 생성 (64 x 128 x 29)
-        self.bert = TFBertModel.from_pretrained(model_name, from_pt=True)
-        self.drop = tf.keras.layers.Dropout(self.bert.config.hidden_dropout_prob)
-        self.classifier = tf.keras.layers.Dense(labels,
-                                                kernel_initializer=tf.keras.initializers.TruncatedNormal(0.02),
-                                                name='classifier')
-
-
-    def call(self, inputs):
-        # encoding input, mask, positional encoding
-        input_ids, attention_mask, token_type_ids = inputs
-        outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
-        all_output = outputs[0]
-        prediction = self.classifier(all_output)
-
-        return prediction
-
-#EMO(감정인식)
-class TFBertForSequenceClassification(tf.keras.Model):
-    def __init__(self, model_name, num_labels):
-        super(TFBertForSequenceClassification, self).__init__()
-        self.bert = TFBertModel.from_pretrained(model_name, from_pt=True)
-        self.drop = tf.keras.layers.Dropout(self.bert.config.hidden_dropout_prob)
-        self.classifier = tf.keras.layers.Dense(num_labels,
-                                                kernel_initializer=tf.keras.initializers.TruncatedNormal(self.bert.config.initializer_range),
-                                                activation='softmax',
-                                                name='classifier')
-
-    def call(self, inputs, training=None, mask=None):
-        input_ids, attention_mask, token_type_ids = inputs
-        outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
-        output = outputs[1]
-        dropped = self.drop(output, training=False)
-        prediction = self.classifier(dropped)
-
-        return prediction
-
-# 훈련 데이터셋 구조 생성 함수
+# 훈련 데이터셋 구조 생성 함수(훈련을 위함)
+#다대다
 def NER_make_datasets(sentences, labels, max_len, tokenizer, converter):
 
   input_ids, attention_masks, token_type_ids, labels_list = [], [], [], []
@@ -65,6 +20,8 @@ def NER_make_datasets(sentences, labels, max_len, tokenizer, converter):
       # label그대로 정답데이터를 만드는 것 보다, 한 단어들 모두 subword로 나뉘어서 인코딩 되므로
       # 원래 단어 위치에 맞게 label index를 넣어주고, subword로 생긴 자리에는 상관 없는 수(29)를 할당해주면서 정답데이터를 만든게 정답률이 높음
       sub_words = tokenizer.tokenize(one_word)
+
+      ############### KHUDOLL AIMODEL 75Lines tokenizer word dictionary
       indexs.extend([converter[one_label]] + [29] * (len(sub_words) - 1))
 
     indexs = indexs[:max_len]
@@ -84,9 +41,15 @@ def NER_make_datasets(sentences, labels, max_len, tokenizer, converter):
   token_type_ids = np.array(token_type_ids, dtype=int)
   labels_list = np.asarray(labels_list, dtype=np.int32)
 
+    #텐서, 어텐션, 세그먼트, 답  => Training_NER_KoBERT 50번줄
   return (input_ids, attention_masks, token_type_ids), labels_list
 
+
+# 장사
 # 예측하려는 입력 문장을 BERT 입력 구조로 변환하는 함수
+# 다대일(감정)
+#예측을 위한 함수(실제 상황에서 실시간으로 들어가는 함수)
+#구별하는이유는 정답데이터의 유무
 def NER_make_datasets_for_prediction(sentences, max_len, tokenizer):
 
   input_ids, attention_masks, token_type_ids, index_positions = [], [], [], []
@@ -122,8 +85,11 @@ def NER_make_datasets_for_prediction(sentences, max_len, tokenizer):
   token_type_ids = np.array(token_type_ids, dtype=int)
   index_positions = np.asarray(index_positions, dtype=np.int32)
 
+# index_positions은 1이면 정답이 있을곳 29면 아님
   return (input_ids, attention_masks, token_type_ids), index_positions
 
+
+#실제 예측하는 함수
 def ner_predict(inputs, tokenizer, model, converter, max_len=128):
   # 입력 데이터 생성
   input_datas, index_positions = NER_make_datasets_for_prediction(inputs, max_len=max_len, tokenizer=tokenizer)
@@ -131,6 +97,7 @@ def ner_predict(inputs, tokenizer, model, converter, max_len=128):
   raw_outputs = model.predict(input_datas)
   # 128 x 29 차원의 원핫 인코딩 형태로 확률 예측값이 나오므로 최댓값만을 뽑아내 128차원 벡터로 변환
   outputs = np.argmax(raw_outputs, axis = -1)
+  #### 감정에도 적용가능할듯
 
   pred_list = []
   result_list = []
@@ -140,6 +107,7 @@ def ner_predict(inputs, tokenizer, model, converter, max_len=128):
     for index_info, output in zip(index_positions[i], outputs[i]):
     # label이 Mask(29)인 부분 빼고 정수를 개체명으로 변환
       if index_info != 29:
+          #convert는 index to tag
         pred_tag.append(converter[output])
 
     pred_list.append(pred_tag)
@@ -154,6 +122,8 @@ def ner_predict(inputs, tokenizer, model, converter, max_len=128):
 
   return result_list
 
+
+#감정사전 라벨
 def label_to_index(label):
   label = label.replace(" ", "")
   if label == "불만":

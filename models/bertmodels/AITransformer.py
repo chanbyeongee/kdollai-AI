@@ -2,6 +2,7 @@ import tensorflow as tf
 import numpy as np
 import re
 
+##Transformer임 일반대화를 위함임!
 class PositionalEncoding(tf.keras.layers.Layer):
     def __init__(self, position, d_model):
         super(PositionalEncoding, self).__init__()
