@@ -43,18 +43,16 @@ def load_Emo_model(converter):
 
     return new_model
 
-def To_DataStructure(input, general_model, NER_model, Emo_model, converters):
+def To_DataStructure(name, inputsentence, general_model, NER_model, Emo_model, converters):
     Data = OrderedDict()
-    sentence = input[0]
-    name = input[1]
     tokenizer = converters[0]
     GCtokenizer = converters[1]
     NER_converter = converters[2]
     Emo_converter = converters[3]
 
-    GeneralAnswer = predict(sentence, GCtokenizer, general_model)
-    NEROut = ner_predict([sentence], tokenizer, NER_model, NER_converter)
-    EmoOut = emo_predict([sentence], tokenizer, Emo_model, Emo_converter)
+    GeneralAnswer = predict(inputsentence, GCtokenizer, general_model)
+    NEROut = ner_predict([inputsentence], tokenizer, NER_model, NER_converter)
+    EmoOut = emo_predict([inputsentence], tokenizer, Emo_model, Emo_converter)
 
     NER = {}
     for (word, tag) in NEROut[0]:
@@ -62,7 +60,7 @@ def To_DataStructure(input, general_model, NER_model, Emo_model, converters):
             NER[word] = tag
 
     Data["Name"] = name
-    Data["Input_Corpus"] = sentence
+    Data["Input_Corpus"] = inputsentence
     Data["NER"] = NER
     Data["Emotion"] = EmoOut
     Data["Type"] = "General"
