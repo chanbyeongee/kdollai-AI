@@ -1,6 +1,6 @@
 import socket
 from threading import Thread
-import KHUDoll_AIModels as AIModels
+from models.bertmodels.aimodel import AIModel
 import struct
 import json
 
@@ -14,10 +14,7 @@ class ServerSession:
         self.__dialogs_buffer = []
         self.__usersList = []
         self.__AddressBook = {}
-        self.converters = converters
-        self.__GeneralCorpus_model = AIModels.load_general_corpus_model(converters[1])
-        self.__NER_model = AIModels.load_NER_model(converters[4])
-        self.__Emo_model = AIModels.load_Emo_model(converters[3])
+        self.main_model = AIModel()
 
     def __answerThread(self, s_socket, pw):
         while True:
@@ -26,8 +23,7 @@ class ServerSession:
                     c_socket, name, message = self.__dialogs_buffer[0]
                     if name in self.__usersList:
                         print("<{}> loaded one dialog : {}" .format(name, message))
-                        dialog_data = AIModels.To_DataStructure(name, message, self.__GeneralCorpus_model, \
-                            self.__NER_model, self.__Emo_model, self.converters)
+                        dialog_data = self.main_model.To_DataStructure(name, message)
                         print(json.dumps(dialog_data, ensure_ascii=False, indent="\t"))
             
                         c_socket.sendall(dialog_data["System_Corpus"].encode())
@@ -37,7 +33,7 @@ class ServerSession:
                     # print(self.__AddressBook)
             except Exception as error:
                 if error is ConnectionResetError or "[WinError 10038] 소켓 이외의 개체에 작업을 시도했습니다":
-                    print("{} client disconntects with server" .format(name))
+                    print("%s client disconntects with server" % (name))
                     if name in self.__usersList: self.__usersList.remove(name)
                 else:
                     print("{} : Error occured" .format(error))
@@ -63,11 +59,11 @@ class ServerSession:
                 print("received by <{}> : {}" .format(name, data))
             except Exception as error:
                 if error is ConnectionResetError or "unpack requires a buffer of 4 bytes":
-                    print("{} client disconntects with server" .format(name))
+                    print("%s client disconntects with server"%(name))
                     if c_address in self.__usersList : self.__usersList.remove(name)
                 else:
                     print("{} : Error occured" .format(error))
-                break;
+                break
 
         c_socket.close()
 
@@ -100,6 +96,6 @@ class ServerSession:
             except Exception as error:
                 print("Error : {}" .format(error))
                 server_socket.close()
-                break;
+                break
 
     

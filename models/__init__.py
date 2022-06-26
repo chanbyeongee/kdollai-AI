@@ -1,1 +1,1 @@
-__all__ = ['tensormodels','trainning','transformers']
+__all__ = ['tensormodels','transformers']
