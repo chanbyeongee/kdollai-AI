@@ -2,14 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3bead704-435b-41cc-bd2f-cb6491893ae6" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/models/bertmodels/SequenceClassification.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/bertmodels/TokenClassification.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/bertmodels/AIKoBERT.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/bertmodels/AIKoBERT.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/bertmodels/AITransformer.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/bertmodels/AITransformer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/bertmodels/KHUDoll_AIModels.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/bertmodels/KHUDoll_AIModels.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/bertmodels/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/bertmodels/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/trainning/Training_NER_KoBERT.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/trainning/Training_NER_KoBERT.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/KHUAIModel/KHUDoll_AIModels.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/KHUAIModel/KHUDoll_AIModels.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/KHUAIModel/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/KHUAIModel/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/trainning/AIServer.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/trainning/AIServer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/transformers/bertmodels/AIKoBERT.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/transformers/bertmodels/AIKoBERT.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,6 +39,7 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\well8\Desktop\WorkSpace\k-doll-ai-chatbot\models\transformers" />
       <recent name="C:\Users\well8\Desktop\WorkSpace\k-doll-ai-chatbot\examples" />
       <recent name="C:\Users\well8\Desktop\WorkSpace\k-doll-ai-chatbot\models" />
       <recent name="C:\Users\well8\Desktop\WorkSpace\k-doll-ai-chatbot\models\trainning" />
@@ -58,5 +56,15 @@
       <updated>1655209293848</updated>
     </task>
     <servers />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/examples/test_Chatbot.py</url>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
