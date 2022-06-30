@@ -1,6 +1,5 @@
 from tensorflow.keras.utils import to_categorical
-from models.bertmodels.aimodel import  AIModel
-from models.bertmodels.tf_bert import *
+from bertmodels import  AIModel
 import pandas as pd
 import tensorflow as tf
 import os

@@ -1,7 +1,6 @@
 import numpy as np
 from sklearn.model_selection import train_test_split
-from models.bertmodels.aimodel import AIModel
-from models.bertmodels.tf_bert import *
+from bertmodels import AIModel
 import pandas as pd
 import os
 

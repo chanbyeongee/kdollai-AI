@@ -23,7 +23,7 @@ class ServerSession:
                     c_socket, name, message = self.__dialogs_buffer[0]
                     if name in self.__usersList:
                         print("<{}> loaded one dialog : {}" .format(name, message))
-                        dialog_data = self.main_model.To_DataStructure(name, message)
+                        dialog_data = self.main_model.run(name, message)
                         print(json.dumps(dialog_data, ensure_ascii=False, indent="\t"))
             
                         c_socket.sendall(dialog_data["System_Corpus"].encode())

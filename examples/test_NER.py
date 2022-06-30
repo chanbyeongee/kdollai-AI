@@ -3,7 +3,7 @@ import pandas as pd
 from tensorflow.keras.utils import to_categorical
 import tensorflow as tf
 import pickle
-from transformers import TFBertForTokenClassification
+from general_transformers import TFBertForTokenClassification
 
 labels = [label.strip() for label in open('C:\MyProjects\Other Projects\AI ChatBot Project/ner_label.txt', 'r', encoding='utf-8')]
 

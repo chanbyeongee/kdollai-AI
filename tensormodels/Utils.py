@@ -1,5 +1,5 @@
 import numpy as np
-from Tokenizer import Tokenizer
+from tokenizer import Tokenizer
 import multiprocessing as mp
 
 global count

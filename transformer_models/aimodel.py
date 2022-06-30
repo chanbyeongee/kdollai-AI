@@ -1,5 +1,5 @@
-from models.transformers.gc_transformer import *
-from models.bertmodels.tf_bert import *
+from .gc_transformer import *
+from .tf_bert import *
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from collections import OrderedDict
 from transformers import BertTokenizer
@@ -8,6 +8,7 @@ import pickle
 import os
 ## 가중치만 만들고 불러오는게 안전하다
 ##모델 만들어오는 함수들
+
 
 class AIModel:
     emotion_labels = {"불만":0, "중립":1, "당혹":2, "기쁨":3, "걱정":4, "질투":5, "슬픔":6, "죄책감":7, "연민":8}
@@ -23,22 +24,20 @@ class AIModel:
     def __init__(self):
         #self.EmotionLabel = emotion_label
         #self.mNER_tag = NER_index
-        self._mTokenizer, self._mGC_tokenizer = self.get_converters()
+        self.get_converters()
 
     def get_converters(self):
-        tokenizer = BertTokenizer.from_pretrained("klue/bert-base")
+        self._mTokenizer = BertTokenizer.from_pretrained("klue/bert-base")
 
         with open(os.environ['CHATBOT_ROOT']+"/resources/converters/tokenizer.pickle", 'rb') as f:
-            GC_tokenizer = pickle.load(f)
-
-        return (tokenizer, GC_tokenizer)
+            self._mGC_tokenizer = pickle.load(f)
 
     def model_loader(self):
-        self.GC_model = self.load_general_corpus_model()
-        self.NER_model = self.load_NER_model()
-        self.EMO_model = self.load_Emo_model()
+        self.GC_model = self._load_general_corpus_model()
+        self.NER_model = self._load_NER_model()
+        self.EMO_model = self._load_Emo_model()
 
-    def load_general_corpus_model(self):
+    def _load_general_corpus_model(self):
         D_MODEL = 256
         NUM_LAYERS = 2
         NUM_HEADS = 8
@@ -56,28 +55,28 @@ class AIModel:
             num_heads=NUM_HEADS,
             dropout=DROPOUT)
 
-        new_model.load_weights(os.environ['CHATBOT_ROOT']+"/resources/weights/Chatbot_Transformer3_weights")
+        new_model.load_weights(os.environ['CHATBOT_ROOT']+"/resources/weights/Transformer_weights")
 
         return new_model
 
-    def load_NER_model(self):
+    def _load_NER_model(self):
         tag_size = len(AIModel.NER_labels)
 
         new_model = TokenClassification("klue/bert-base", labels=tag_size+1)
-        new_model.load_weights(os.environ['CHATBOT_ROOT']+"/resources/weights/NER_KoBERT")
+        new_model.load_weights(os.environ['CHATBOT_ROOT']+"/resources/weights/NER_weights")
 
         return new_model
 
-    def load_Emo_model(self):
+    def _load_Emo_model(self):
 
         new_model = SequenceClassification("klue/bert-base", num_labels=len(AIModel.emotion_labels))
-        new_model.load_weights(os.environ['CHATBOT_ROOT']+"/resources/weights/EmoClass_KoBERT")
+        new_model.load_weights(os.environ['CHATBOT_ROOT']+"/resources/weights/Emo_weights")
 
         return new_model
 
 
 ##광명님이 말하는 자료구조로 만들어주는 함수
-    def To_DataStructure(self,name,inputsentence):
+    def run(self, name, inputsentence):
         #genral_model, NER_model, EMO-model,
 
         #tokenizer, GC_tokenizer, index_to_NERtag, index_to_EmotionWord, ner_labels = get_converters()
@@ -97,8 +96,8 @@ class AIModel:
         ######### classmethod로 바꾸기 VS 현행유지
         GeneralAnswer = predict(inputsentence, self._mGC_tokenizer, self.GC_model)
         #예측 함수들 모임들
-        NEROut = self.ner_predict([inputsentence], self._mTokenizer)
-        EmoOut = self.emo_predict([inputsentence], self._mTokenizer)
+        NEROut = self._ner_predict([inputsentence], self._mTokenizer)
+        EmoOut = self._emo_predict([inputsentence], self._mTokenizer)
 
         NER = {}
         for (word, tag) in NEROut[0]:
@@ -228,7 +227,7 @@ class AIModel:
         return (input_ids, attention_masks, token_type_ids)
     #
     # 실제 예측하는 함수
-    def ner_predict(self, inputs, max_len=128):
+    def _ner_predict(self, inputs, max_len=128):
         # inputs, tokenizer, model, converter, max_len=128
         # 입력 데이터 생성
 
@@ -262,7 +261,7 @@ class AIModel:
 
         return result_list
 
-    def emo_predict(self,sentences, max_len=128):
+    def _emo_predict(self,sentences, max_len=128):
 
         # 예측에 필요한 데이터폼 생성
         input = self.EMO_make_datasets(sentences, max_len)
