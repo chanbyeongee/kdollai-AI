@@ -46,7 +46,7 @@ class AIModel:
 
         VOCAB_SIZE = self._mGC_tokenizer.vocab_size + 2
         #print(VOCAB_SIZE)
-
+        print("########Loading GC model!!!########")
         new_model = transformer(
             vocab_size=VOCAB_SIZE,
             num_layers=NUM_LAYERS,
@@ -55,22 +55,23 @@ class AIModel:
             num_heads=NUM_HEADS,
             dropout=DROPOUT)
 
-        new_model.load_weights(os.environ['CHATBOT_ROOT']+"/resources/weights/Transformer_weights")
+        new_model.load_weights(os.environ['CHATBOT_ROOT']+"/resources/weights/Transformer_weights/Transformer_weights")
 
         return new_model
 
     def _load_NER_model(self):
+        print("########Loading NER model!!!########")
         tag_size = len(AIModel.NER_labels)
 
         new_model = TokenClassification("klue/bert-base", labels=tag_size+1)
-        new_model.load_weights(os.environ['CHATBOT_ROOT']+"/resources/weights/NER_weights")
+        new_model.load_weights(os.environ['CHATBOT_ROOT']+"/resources/weights/NER_weights/NER_weights")
 
         return new_model
 
     def _load_Emo_model(self):
-
+        print("########Loading EMO model!!!########")
         new_model = SequenceClassification("klue/bert-base", num_labels=len(AIModel.emotion_labels))
-        new_model.load_weights(os.environ['CHATBOT_ROOT']+"/resources/weights/Emo_weights")
+        new_model.load_weights(os.environ['CHATBOT_ROOT']+"/resources/weights/Emo_weights/Emo_weights")
 
         return new_model
 
@@ -84,7 +85,7 @@ class AIModel:
         # GeneralCorpus_model = load_general_corpus_model(GC_tokenizer)
         # NER_model = load_NER_model(ner_labels)
         # Emo_model = load_Emo_model(index_to_EmotionWord)
-        self.model_loader()
+        #self.model_loader()
 
         Data = OrderedDict()
 
@@ -96,8 +97,11 @@ class AIModel:
         ######### classmethod로 바꾸기 VS 현행유지
         GeneralAnswer = predict(inputsentence, self._mGC_tokenizer, self.GC_model)
         #예측 함수들 모임들
-        NEROut = self._ner_predict([inputsentence], self._mTokenizer)
-        EmoOut = self._emo_predict([inputsentence], self._mTokenizer)
+
+        NEROut = self._ner_predict([inputsentence])
+
+        EmoOut = self._emo_predict([inputsentence])
+
 
         NER = {}
         for (word, tag) in NEROut[0]:
@@ -164,12 +168,17 @@ class AIModel:
 
     def NER_make_datasets(self, sentences, max_len):
     #sentences, max_len, tokenizer
+
         input_ids, attention_masks, token_type_ids, index_positions = [], [], [], []
 
         for sentence in sentences:
             # 문장별로 정수 인코딩 진행
-            input_id = self._mTokenizer.encode(sentence, max_length=max_len)
+
+
+            input_id = self._mTokenizer.encode(sentence,max_length=max_len)
+            #maxlength
             # encode한 정수들의 수만큼 1로 할당
+
             attention_mask = [1] * len(input_id)
             # 입력(문장)이 1개이므로 세그먼트 임베딩의 모든 차원이 0
             token_type_id = [0] * max_len
@@ -180,6 +189,7 @@ class AIModel:
                 sub_words = self._mTokenizer.tokenize(one_word)
                 indexs.extend([1] + [29] * (len(sub_words) - 1))
 
+
             indexs = indexs[:max_len]
 
             input_ids.append(input_id)
@@ -187,15 +197,18 @@ class AIModel:
             token_type_ids.append(token_type_id)
             index_positions.append(indexs)
 
+
         # 패딩
         input_ids = pad_sequences(input_ids, padding='post', maxlen=max_len)
         attention_masks = pad_sequences(attention_masks, padding='post', maxlen=max_len)
         index_positions = pad_sequences(index_positions, padding='post', maxlen=max_len, value=29)
 
+
         input_ids = np.array(input_ids, dtype=int)
         attention_masks = np.array(attention_masks, dtype=int)
         token_type_ids = np.array(token_type_ids, dtype=int)
         index_positions = np.asarray(index_positions, dtype=np.int32)
+
 
         # index_positions은 1이면 정답이 있을곳 29면 아님
         return (input_ids, attention_masks, token_type_ids), index_positions
@@ -233,6 +246,7 @@ class AIModel:
 
         input_datas, index_positions = self.NER_make_datasets(inputs, max_len=max_len)
         # 예측
+
         raw_outputs = self.NER_model.predict(input_datas)
         # 128 x 29 차원의 원핫 인코딩 형태로 확률 예측값이 나오므로 최댓값만을 뽑아내 128차원 벡터로 변환
         outputs = np.argmax(raw_outputs, axis=-1)
@@ -258,7 +272,6 @@ class AIModel:
                 result.append((one_word, one_label))
             result_list.append(result)
             # print("-----------------------------")
-
         return result_list
 
     def _emo_predict(self,sentences, max_len=128):

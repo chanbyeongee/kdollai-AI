@@ -39,6 +39,11 @@ def download_weights():
         output = weight_path+"/Emo_weights/Emo_weights.index"
         gdown.download(loaded["EMO-index-url"], output, quiet=False)
 
+    # if not os.path.isfile(weight_path+"/Emo_weights/checkpoint") or Emo_flag:
+    #     print("Downloading Emo checkpoint...")
+    #     output = weight_path+"/Emo_weights/checkpoint"
+    #     gdown.download(loaded["EMO-check-url"], output, quiet=False)
+
     if not os.path.isfile(weight_path+"/Emo_weights/Emo_weights.data-00000-of-00001") or Emo_flag:
         print("Downloading Emo pretrained weights...")
         output = weight_path+"/Emo_weights/Emo_weights.data-00000-of-00001"
@@ -49,6 +54,11 @@ def download_weights():
         output = weight_path+"/NER_weights/NER_weights.index"
         gdown.download(loaded["NER-index-url"], output, quiet=False)
 
+    # if not os.path.isfile(weight_path+"/NER_weights/checkpoint") or NER_flag:
+    #     print("Downloading NER checkpoint...")
+    #     output = weight_path+"/Emo_weights/checkpoint"
+    #     gdown.download(loaded["NER-check-url"], output, quiet=False)
+
     if not os.path.isfile(weight_path+"/NER_weights/NER_weights.data-00000-of-00001") or NER_flag:
         print("Downloading NER pretrained weights...")
         output = weight_path+"/NER_weights/NER_weights.data-00000-of-00001"
@@ -58,6 +68,11 @@ def download_weights():
         print("Downloading Transformer pretrained index...")
         output = weight_path+"/Transformer_weights/Transformer_weights.index"
         gdown.download(loaded["Transformer-index-url"], output, quiet=False)
+
+    # if not os.path.isfile(weight_path+"/Transformer_weights/checkpoint") or Transformer_flag:
+    #     print("Downloading Transformer checkpoint...")
+    #     output = weight_path+"/Transformer_weights/checkpoint"
+    #     gdown.download(loaded["Transformer-check-url"], output, quiet=False)
 
     if not os.path.isfile(weight_path+"/Transformer_weights/Transformer_weights.data-00000-of-00001") or Transformer_flag:
         print("Downloading Transformer pretrained weights...")
