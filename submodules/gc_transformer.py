@@ -1,6 +1,29 @@
 import tensorflow as tf
 import numpy as np
 import re
+from submodules import VOCAB_SIZE, os
+
+
+def load_general_corpus_model():
+    D_MODEL = 256
+    NUM_LAYERS = 2
+    NUM_HEADS = 8
+    DFF = 512
+    DROPOUT = 0.1
+
+    # print(VOCAB_SIZE)
+    print("########Loading GC model!!!########")
+    new_model = transformer(
+        vocab_size=VOCAB_SIZE,
+        num_layers=NUM_LAYERS,
+        dff=DFF,
+        d_model=D_MODEL,
+        num_heads=NUM_HEADS,
+        dropout=DROPOUT)
+
+    new_model.load_weights(os.environ['CHATBOT_ROOT'] + "/resources/weights/Transformer_weights/Transformer_weights")
+
+    return new_model
 
 ##Transformer임 일반대화를 위함임!
 class PositionalEncoding(tf.keras.layers.Layer):
