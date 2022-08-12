@@ -1,6 +1,8 @@
 from submodules import emotion_mapping_by_index, mTokenizer, emotion_labels, SequenceClassification, np, os
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
+# mTokenizer = BertTokenizer.from_pretrained("klue/bert-base")
+
 def emo_make_datasets(sentences, max_len=128):
     input_ids, attention_masks, token_type_ids = [], [], []
 

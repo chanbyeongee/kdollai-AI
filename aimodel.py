@@ -1,4 +1,7 @@
-from submodules import *
+from submodules.emo_classifier import *
+from submodules.ner_classifier import *
+from submodules.gc_transformer import *
+from submodules import mGC_tokenizer
 from collections import OrderedDict
 
 ## 가중치만 만들고 불러오는게 안전하다
