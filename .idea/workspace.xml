@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="f608fd03-6394-44d0-9b30-cdf87b5a4d6d" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/k-doll-ai-chatbot.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/k-doll-ai-chatbot.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tensormodels/Encoding.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tensormodels/Utils.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tensormodels/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tensormodels/emotion_recognizer.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tokenizer/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tokenizer/.idea/Tokenizer.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tokenizer/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tokenizer/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tokenizer/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tokenizer/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tokenizer/Hanspell.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tokenizer/KoNLPy.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tokenizer/Tokenizer.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tokenizer/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tokenizer/jamo_dict.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/trainning/Training_Chatbot_Transformer.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/trainning/Training_EmoClass_KoBERT.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/trainning/Training_NER_KoBERT.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/transformer_models/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/transformer_models/aimodel.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/transformer_models/gc_transformer.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/transformer_models/tf_bert.py" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2Ci7EPE0eNmTACmi3fOSJp1yIQY" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="f608fd03-6394-44d0-9b30-cdf87b5a4d6d" name="Changes" comment="" />
+      <created>1659273438643</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1659273438643</updated>
+    </task>
+    <servers />
+  </component>
+</project>
