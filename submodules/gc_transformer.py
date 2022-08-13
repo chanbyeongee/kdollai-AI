@@ -2,7 +2,10 @@ import tensorflow as tf
 import numpy as np
 import re
 from submodules import VOCAB_SIZE, os
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from transformers import BertTokenizer
 
+mTokenizer = BertTokenizer.from_pretrained("klue/bert-base")
 
 def load_general_corpus_model():
     D_MODEL = 256
@@ -24,6 +27,58 @@ def load_general_corpus_model():
     new_model.load_weights(os.environ['CHATBOT_ROOT'] + "/resources/weights/Transformer_weights/Transformer_weights")
 
     return new_model
+
+def predict(sentence, model, tokenizer):
+    prediction = make_datasets_for_prediction(sentence, model, tokenizer)
+
+    # prediction == 디코더가 리턴한 챗봇의 대답에 해당하는 정수 시퀀스
+    # tokenizer.decode()를 통해 정수 시퀀스를 문자열로 디코딩.
+    predicted_sentence = tokenizer.decode(
+        [i for i in prediction if i < tokenizer.vocab_size])
+
+    print('Input: {}'.format(sentence))
+    print('Output: {}'.format(predicted_sentence))
+
+    return predicted_sentence
+
+def make_datasets_for_prediction(sentence, model, tokenizer):
+
+    SEP = [2]
+    CLS = [3]
+    
+    tokenized = tokenizer.encode(sentence)
+
+    # 입력 문장에 시작 토큰과 종료 토큰을 추가
+    sentence = tf.expand_dims( tokenized + [0] * (128-len(tokenized)), axis=0 )
+    position = tf.expand_dims( [1] * len(tokenized) + [0] * (128-len(tokenized)), axis=0 )
+    segment = tf.expand_dims( [0] * 128, axis=0 )
+
+    output = tf.expand_dims(SEP, 0)
+
+    # print(sentence)
+    # print(position)
+    # print(segment)
+    # print(output)
+
+    # 디코더의 예측 시작
+    for i in range(128):
+        predictions = model(inputs=[sentence, position, segment, output], training=False)
+
+        # 현재 시점의 예측 단어를 받아온다.
+        predictions = predictions[:, -1:, :]
+        predicted_id = tf.cast(tf.argmax(predictions, axis=-1), tf.int32)
+
+        # 만약 현재 시점의 예측 단어가 종료 토큰이라면 예측을 중단
+        if tf.equal(predicted_id, CLS[0]):
+            break
+
+        # 현재 시점의 예측 단어를 output(출력)에 연결한다.
+        # output은 for문의 다음 루프에서 디코더의 입력이 된다.
+        output = tf.concat([output, predicted_id], axis=-1)
+        # print(output)
+
+    # 단어 예측이 모두 끝났다면 output을 리턴.
+    return tf.squeeze(output, axis=0)
 
 ##Transformer임 일반대화를 위함임!
 class PositionalEncoding(tf.keras.layers.Layer):

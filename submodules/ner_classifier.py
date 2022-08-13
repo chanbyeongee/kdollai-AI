@@ -1,9 +1,20 @@
-try:
+# try:
+# from submodules import NER_labels, mNER_tokenizer, np, NER_mapping_by_index, index_mapping_by_NER, os, TokenClassiPfication
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from transformers import BertTokenizer
+import numpy as np
+import pickle
+import os
+from submodules.tf_bert import TokenClassification
 
-    from submodules import NER_labels, mNER_tokenizer, np, NER_mapping_by_index, index_mapping_by_NER, TokenClassification, os
-    from tensorflow.keras.preprocessing.sequence import pad_sequences
-except Exception as error:
-    pass
+mNER_tokenizer = pickle.load(open(os.environ['CHATBOT_ROOT'] + "/resources/converters/letter_to_index.pickle", 'rb'))
+index_mapping_by_NER = {'O': 0, 'B-LC': 1, 'I-LC': 2, 'B-QT': 3, 'I-QT': 4, 'B-OG': 5, 'I-OG': 6, 'B-DT': 7, 'I-DT': 8, 
+                        'B-PS': 9, 'I-PS': 10, 'B-TI': 11, 'I-TI': 12}
+NER_mapping_by_index = {0 : '0', 1 : 'B-LC', 2 : 'I-LC', 3 : 'B-QT', 4 : 'I-QT', 5 : 'B-OG', 6 : 'I-OG', 7 : 'B-DT', 
+                        8 : 'I-DT', 9 : 'B-PS', 10 : 'I-PS', 11 : 'B-TI', 12 : 'I-TI', 13 : 'UNK'}
+NER_labels = dict((value, key) for (key, value) in NER_mapping_by_index.items())
+# except Exception as error:
+#     pass
 
 def encode_to_integer_input(sentence):
     inputdata = []
@@ -175,6 +186,8 @@ def ner_predict(model, inputs, max_len=128):
 
     result_list = []
 
+    inputs = inputs[0]
+
     for i in range(len(inputs)):
         if y_predicted[0][i] == 1:
             LC = inputs[i]
@@ -244,14 +257,15 @@ def ner_predict(model, inputs, max_len=128):
 def load_NER_model():
     print("########Loading NER model!!!########")
     tag_size = len(NER_labels)
-    new_model = TokenClassification("klue/bert-base", labels=tag_size+1)
+    new_model = TokenClassification("klue/bert-base", labels=tag_size)
     new_model.load_weights(os.environ['CHATBOT_ROOT']+"/resources/weights/NER_weights/NER_weights")
 
     return new_model
 
-new_model = load_NER_model()
+# if __name__ == "__main__":
+#     new_model = load_NER_model()
 
-sample = "오늘 엄마가 심하게 때렸어"
+#     sample = "오늘 엄마가 심하게 때렸어"
 
-prediction = ner_predict(new_model, sample)
-print(prediction)
+#     prediction = ner_predict(new_model, sample)
+#     print(prediction)
