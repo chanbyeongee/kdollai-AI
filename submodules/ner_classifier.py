@@ -1,11 +1,11 @@
 # try:
 # from submodules import NER_labels, mNER_tokenizer, np, NER_mapping_by_index, index_mapping_by_NER, os, TokenClassiPfication
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-from transformers import BertTokenizer
 import numpy as np
 import pickle
 import os
-from submodules.tf_bert import TokenClassification
+from transformers import TFBertModel
+import tensorflow as tf
 
 mNER_tokenizer = pickle.load(open(os.environ['CHATBOT_ROOT'] + "/resources/converters/letter_to_index.pickle", 'rb'))
 index_mapping_by_NER = {'O': 0, 'B-LC': 1, 'I-LC': 2, 'B-QT': 3, 'I-QT': 4, 'B-OG': 5, 'I-OG': 6, 'B-DT': 7, 'I-DT': 8, 
@@ -15,6 +15,129 @@ NER_mapping_by_index = {0 : '0', 1 : 'B-LC', 2 : 'I-LC', 3 : 'B-QT', 4 : 'I-QT',
 NER_labels = dict((value, key) for (key, value) in NER_mapping_by_index.items())
 # except Exception as error:
 #     pass
+
+def load_NER_model():
+    print("########Loading NER model!!!########")
+    tag_size = len(NER_labels)
+    new_model = NERBertModel("klue/bert-base", labels=tag_size)
+    new_model.load_weights(os.environ['CHATBOT_ROOT']+"/resources/weights/NER_weights/NER_weights")
+
+    return new_model
+
+class NERBertModel(tf.keras.Model):
+    def __init__(self, model_name, labels):
+        super(NERBertModel, self).__init__()
+        # 모델 구조 생성 (64 x 128 x 29)
+        self.bert = TFBertModel.from_pretrained(model_name, from_pt=True)
+        self.drop = tf.keras.layers.Dropout(self.bert.config.hidden_dropout_prob)
+        self.classifier = tf.keras.layers.Dense(labels,
+                                                kernel_initializer=tf.keras.initializers.TruncatedNormal(0.02),
+                                                name='classifier')
+
+    def call(self, inputs, training=None, mask=None):
+        # encoding input, mask, positional encoding
+        input_ids, attention_mask, token_type_ids = inputs
+        outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+        # Bert의 값이 (encoder)/ pooler값이 반환됨 64*128*29 (단어마다 매김)
+        all_output = outputs[0]
+        prediction = self.classifier(all_output)
+
+        return prediction
+
+
+def ner_predict(model, inputs, max_len=128):
+    # inputs, tokenizer, model, converter, max_len=128
+    # 입력 데이터 생성
+
+    input_datas = ner_make_datasets(inputs, max_len=max_len, tokenizer=mNER_tokenizer)
+    # 예측
+
+    raw_outputs = model.predict(input_datas)
+    # 128 x 29 차원의 원핫 인코딩 형태로 확률 예측값이 나오므로 최댓값만을 뽑아내 128차원 벡터로 변환
+    y_predicted = np.argmax(raw_outputs, axis=-1)
+    #### 감정에도 적용가능할듯
+    
+    LC, QT, OG, DT, PS, TI = "", "", "", "", "", ""
+
+    result_list = []
+
+    inputs = inputs[0]
+
+    for i in range(len(inputs)):
+        if y_predicted[0][i] == 1:
+            LC = inputs[i]
+            while y_predicted[0][i+1] == 2:
+                LC += inputs[i+1]
+                i += 1
+            if LC not in result_list: result_list.append(("LC", LC))
+            LC = ""
+        elif y_predicted[0][i] == 3:
+            QT = inputs[i]
+            while y_predicted[0][i+1] == 4:
+                QT += inputs[i+1]
+                i += 1
+            if QT not in result_list: result_list.append(("QT", QT))
+            QT = ""
+        elif y_predicted[0][i] == 5:
+            OG = inputs[i]
+            while y_predicted[0][i+1] == 6:
+                OG += inputs[i+1]
+                i += 1
+            if OG not in result_list: result_list.append(("OG", OG))
+            OG = ""
+        elif y_predicted[0][i] == 7:
+            DT = inputs[i]
+            while y_predicted[0][i+1] == 8:
+                DT += inputs[i+1]
+                i += 1
+            if DT not in result_list: result_list.append(("DT", DT))
+            DT = ""
+        elif y_predicted[0][i] == 9:
+            PS = inputs[i]
+            while y_predicted[0][i+1] == 10:
+                PS += inputs[i+1]
+                i += 1
+            if PS not in result_list: result_list.append(("PS", PS))
+            PS = ""
+        elif y_predicted[0][i] == 11:
+            TI = inputs[i]
+            while y_predicted[0][i+1] == 12:
+                TI += inputs[i+1]
+                i += 1
+            if TI not in result_list: result_list.append(("TI", TI))
+            TI = ""
+
+    return result_list
+
+def ner_make_datasets(sentences, max_len, tokenizer):
+
+    cls_index = tokenizer['[CLS]']
+    sep_index = tokenizer['[SEP]']
+
+    input_ids, attention_masks, token_type_ids = [], [], []
+
+    for sentence in sentences:
+        input_id = encode_to_integer_input(sentence)
+        input_id = input_id + [sep_index]
+        input_id = [cls_index] + input_id
+        # encode한 정수들의 수만큼 1로 할당
+        attention_mask = [1] * len(input_id)
+        # 입력(문장)이 1개이므로 세그먼트 임베딩의 모든 차원이 0
+        token_type_id = [0] * max_len
+
+        input_ids.append(input_id)
+        attention_masks.append(attention_mask)
+        token_type_ids.append(token_type_id)
+
+    # 패딩
+    input_ids = pad_sequences(input_ids, padding='post', maxlen=max_len)
+    attention_masks = pad_sequences(attention_masks, padding='post', maxlen=max_len)
+
+    input_ids = np.array(input_ids, dtype=int)
+    attention_masks = np.array(attention_masks, dtype=int)
+    token_type_ids = np.array(token_type_ids, dtype=int)
+
+    return (input_ids, attention_masks, token_type_ids)
 
 def encode_to_integer_input(sentence):
     inputdata = []
@@ -50,36 +173,6 @@ def encode_to_integer_target(sentences, max_len):
     target_list = np.asarray(target_list, dtype=np.int32)
 
     return target_list
-
-def ner_make_datasets(sentences, max_len, tokenizer):
-
-    cls_index = tokenizer['[CLS]']
-    sep_index = tokenizer['[SEP]']
-
-    input_ids, attention_masks, token_type_ids = [], [], []
-
-    for sentence in sentences:
-        input_id = encode_to_integer_input(sentence)
-        input_id = input_id + [sep_index]
-        input_id = [cls_index] + input_id
-        # encode한 정수들의 수만큼 1로 할당
-        attention_mask = [1] * len(input_id)
-        # 입력(문장)이 1개이므로 세그먼트 임베딩의 모든 차원이 0
-        token_type_id = [0] * max_len
-
-        input_ids.append(input_id)
-        attention_masks.append(attention_mask)
-        token_type_ids.append(token_type_id)
-
-    # 패딩
-    input_ids = pad_sequences(input_ids, padding='post', maxlen=max_len)
-    attention_masks = pad_sequences(attention_masks, padding='post', maxlen=max_len)
-
-    input_ids = np.array(input_ids, dtype=int)
-    attention_masks = np.array(attention_masks, dtype=int)
-    token_type_ids = np.array(token_type_ids, dtype=int)
-
-    return (input_ids, attention_masks, token_type_ids)
 
 # def ner_make_datasets_training(sentences, labels, max_len):
 #     input_ids, attention_masks, token_type_ids, labels_list = [], [], [], []
@@ -168,99 +261,6 @@ def ner_make_datasets(sentences, max_len, tokenizer):
 #     # index_positions은 1이면 정답이 있을곳 29면 아님
 #     return (input_ids, attention_masks, token_type_ids), index_positions
 
-def ner_predict(model, inputs, max_len=128):
-    # inputs, tokenizer, model, converter, max_len=128
-    # 입력 데이터 생성
-
-    input_datas = ner_make_datasets(inputs, max_len=max_len, tokenizer=mNER_tokenizer)
-    # 예측
-
-    raw_outputs = model.predict(input_datas)
-    # 128 x 29 차원의 원핫 인코딩 형태로 확률 예측값이 나오므로 최댓값만을 뽑아내 128차원 벡터로 변환
-    y_predicted = np.argmax(raw_outputs, axis=-1)
-    #### 감정에도 적용가능할듯
-    
-    LC, QT, OG, DT, PS, TI = "", "", "", "", "", ""
-
-    LClist, QTlist, OGlist, DTlist, PSlist, TIlist = [], [], [], [], [], []
-
-    result_list = []
-
-    inputs = inputs[0]
-
-    for i in range(len(inputs)):
-        if y_predicted[0][i] == 1:
-            LC = inputs[i]
-            while y_predicted[0][i+1] == 2:
-                LC += inputs[i+1]
-                i += 1
-            if LC not in result_list: result_list.append(("LC", LC))
-            LC = ""
-        elif y_predicted[0][i] == 3:
-            QT = inputs[i]
-            while y_predicted[0][i+1] == 4:
-                QT += inputs[i+1]
-                i += 1
-            if QT not in result_list: result_list.append(("QT", QT))
-            QT = ""
-        elif y_predicted[0][i] == 5:
-            OG = inputs[i]
-            while y_predicted[0][i+1] == 6:
-                OG += inputs[i+1]
-                i += 1
-            if OG not in result_list: result_list.append(("OG", OG))
-            OG = ""
-        elif y_predicted[0][i] == 7:
-            DT = inputs[i]
-            while y_predicted[0][i+1] == 8:
-                DT += inputs[i+1]
-                i += 1
-            if DT not in result_list: result_list.append(("DT", DT))
-            DT = ""
-        elif y_predicted[0][i] == 9:
-            PS = inputs[i]
-            while y_predicted[0][i+1] == 10:
-                PS += inputs[i+1]
-                i += 1
-            if PS not in result_list: result_list.append(("PS", PS))
-            PS = ""
-        elif y_predicted[0][i] == 11:
-            TI = inputs[i]
-            while y_predicted[0][i+1] == 12:
-                TI += inputs[i+1]
-                i += 1
-            if TI not in result_list: result_list.append(("TI", TI))
-            TI = ""
-
-    # pred_list = []
-    # result_list = []
-
-    # for i in range(0, len(index_positions)):
-    #     pred_tag = []
-    #     for index_info, output in zip(index_positions[i], outputs[i]):
-    #         # label이 Mask(29)인 부분 빼고 정수를 개체명으로 변환
-    #         if index_info != 29:
-    #             # convert는 index to tag
-    #             pred_tag.append(NER_mapping_by_index[output])
-
-    #     pred_list.append(pred_tag)
-
-    # #   print("\n-----------------------------")
-    # for input, preds in zip(inputs, pred_list):
-    #     result = []
-    #     for one_word, one_label in zip(input.split(), preds):
-    #         result.append((one_word, one_label))
-    #     result_list.append(result)
-    #     # print("-----------------------------")
-    return result_list
-
-def load_NER_model():
-    print("########Loading NER model!!!########")
-    tag_size = len(NER_labels)
-    new_model = TokenClassification("klue/bert-base", labels=tag_size)
-    new_model.load_weights(os.environ['CHATBOT_ROOT']+"/resources/weights/NER_weights/NER_weights")
-
-    return new_model
 
 # if __name__ == "__main__":
 #     new_model = load_NER_model()

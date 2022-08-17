@@ -1,7 +1,53 @@
-from submodules import emotion_mapping_by_index, mTokenizer, emotion_labels, SequenceClassification, np, os
+# from submodules import emotion_mapping_by_index, mTokenizer, emotion_labels, SequenceClassification, np, os
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+from transformers import TFBertModel, BertTokenizer
+import tensorflow as tf
+import os
+import numpy as np
 
-# mTokenizer = BertTokenizer.from_pretrained("klue/bert-base")
+mTokenizer = BertTokenizer.from_pretrained("klue/bert-base")
+emotion_labels = {"불만": 0, "중립": 1, "당혹": 2, "기쁨": 3, "걱정": 4, "질투": 5, "슬픔": 6, "죄책감": 7, "연민": 8}
+emotion_mapping_by_index = dict((value, key) for (key, value) in emotion_labels.items())
+
+def load_Emo_model():
+    print("########Loading EMO model!!!########")
+    new_model = EmotionClassificationBertModel("klue/bert-base", num_labels=len(emotion_labels))
+    # new_model.build(input_shape=[((None, 128)), ((None, 128)), ((None, 128))])
+    new_model.load_weights(os.environ['CHATBOT_ROOT']+"/resources/weights/Emo_weights/Emo_weights")
+
+    return new_model
+
+class EmotionClassificationBertModel(tf.keras.Model):
+    def __init__(self, model_name, num_labels):
+        super(EmotionClassificationBertModel, self).__init__()
+        self.bert = TFBertModel.from_pretrained(model_name, from_pt=True)
+        self.drop = tf.keras.layers.Dropout(self.bert.config.hidden_dropout_prob)
+        self.classifier = tf.keras.layers.Dense(num_labels,
+                                                kernel_initializer=tf.keras.initializers.TruncatedNormal(self.bert.config.initializer_range),
+                                                activation='softmax',
+                                                name='classifier')
+
+    def call(self, inputs, training=None, mask=None):
+        input_ids, attention_mask, token_type_ids = inputs
+        outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+
+        #Bert의 값이 encoder (pooler)값이 반환됨 64*29
+        output = outputs[1]
+        dropped = self.drop(output, training=False)
+        prediction = self.classifier(dropped)
+
+        return prediction
+
+def emo_predict(model, sentences, max_len=128):
+
+    # 예측에 필요한 데이터폼 생성
+    input = emo_make_datasets(sentences, max_len)
+    raw_output = model.predict(input)
+    output = np.argmax(raw_output, axis=-1)
+
+    prediction = emotion_mapping_by_index[output[0]]
+
+    return prediction
 
 def emo_make_datasets(sentences, max_len=128):
     input_ids, attention_masks, token_type_ids = [], [], []
@@ -27,22 +73,3 @@ def emo_make_datasets(sentences, max_len=128):
     token_type_ids = np.array(token_type_ids, dtype=int)
 
     return (input_ids, attention_masks, token_type_ids)
-
-def emo_predict(model, sentences, max_len=128):
-
-    # 예측에 필요한 데이터폼 생성
-    input = emo_make_datasets(sentences, max_len)
-    raw_output = model.predict(input)
-    output = np.argmax(raw_output, axis=-1)
-
-    prediction = emotion_mapping_by_index[output[0]]
-
-    return prediction
-
-def load_Emo_model():
-    print("########Loading EMO model!!!########")
-    new_model = SequenceClassification("klue/bert-base", num_labels=len(emotion_labels))
-    new_model.build(input_shape=[((None, 128)), ((None, 128)), ((None, 128))])
-    new_model.load_weights(os.environ['CHATBOT_ROOT']+"/resources/weights/Emo_weights/Emo_weights")
-
-    return new_model
