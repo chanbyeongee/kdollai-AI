@@ -1,7 +1,19 @@
+## setup
+from setup import setup_environ
+
+setup_environ()
+
+## device 관련 설정
+import os
+
+# CPU만 사용
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+# GPU log 설정
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
+
 from submodules.emo_classifier import *
 from submodules.ner_classifier import *
 from submodules.gc_transformer import *
-from submodules import mGC_tokenizer
 from collections import OrderedDict
 
 ## 가중치만 만들고 불러오는게 안전하다
@@ -26,12 +38,12 @@ class AIModel:
 
         Data = OrderedDict()
 
-        GeneralAnswer = predict(inputsentence, self._mGC_tokenizer, self.GC_model)
+        GeneralAnswer = GC_predict(inputsentence, self.GC_model, self._mTokenizer)
         NEROut = ner_predict(self.NER_model,[inputsentence])
         EmoOut = emo_predict(self.EMO_model,[inputsentence])
 
         NER = {}
-        for (word, tag) in NEROut[0]:
+        for (word, tag) in NEROut:
             if tag != "O":
                 NER[word] = tag
 
@@ -43,3 +55,14 @@ class AIModel:
         Data["System_Corpus"] = GeneralAnswer
 
         return Data
+
+DoDam = AIModel()
+
+DoDam.model_loader()
+
+UserName = "민채"
+
+while True:
+    sample = input("입력 : ")
+    output = DoDam.run(UserName, sample)
+    print("출력 : {}" .format(output))
