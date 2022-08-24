@@ -31,7 +31,9 @@ def download_weights():
         loaded = json.load(f)
         Emo_flag = not loaded["EMO-weights-version"] == Emo_version
         NER_flag = not loaded["NER-weights-version"] == NER_version
-        Transformer_flag = not loaded['Transformer-weights-version'] == Transformer_version
+        Transformer_flag = not loaded['Transformer-weig' \
+                                      '' \
+                                      'hts-version'] == Transformer_version
 
     weight_path = this_dir.replace("\\","/") + "/resources/weights"
     if not os.path.isfile(weight_path+"/Emo_weights/Emo_weights.index") or Emo_flag:
