@@ -15,6 +15,7 @@ from submodules.emo_classifier import *
 from submodules.ner_classifier import *
 from submodules.gd_generator import *
 from submodules.topic_classifier import *
+from ToolPack.danger_detector import *
 from collections import OrderedDict
 
 ## 가중치만 만들고 불러오는게 안전하다
@@ -36,6 +37,7 @@ class AIModel:
         self.NER_model = load_NER_model()
         self.EMO_model = load_Emo_model()
         self.Topic_model = load_Topic_model()
+        self.danger_detector = detector()
 
     def manage_dailogbuffer(self):
         if len(self.dialog_buffer) < 3:
@@ -74,7 +76,7 @@ class AIModel:
             print(topic_percentage)
             if EmoOut == '불만' or EmoOut == '당혹' or EmoOut == '걱정' or EmoOut == '질투' or EmoOut == '슬픔' \
                 or EmoOut == '죄책감' or EmoOut == '연민':
-                topic_index = np.argmax(topic_prob_vec[:7])
+                topic_index = np.argmax(topic_prob_vec[0][:7])
                 altered_topic_output = self._topic_converter[topic_index]
                 Topic = altered_topic_output
             else:
@@ -96,6 +98,8 @@ class AIModel:
 
         GeneralAnswer, Name_Entity, Emotion, Topic = self.get_results(inputsentence)
 
+        Bads = self.danger_detector.detect(inputsentence)
+
         Data["Name"] = name
         Data["Input_Corpus"] = inputsentence
         Data["NER"] = Name_Entity
@@ -103,6 +107,7 @@ class AIModel:
         Data["Topic"] = Topic
         Data["Type"] = "General"
         Data["System_Corpus"] = GeneralAnswer
+        Data["Dangers"] = Bads
 
         return Data
 
