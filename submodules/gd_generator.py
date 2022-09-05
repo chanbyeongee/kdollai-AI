@@ -19,7 +19,7 @@ def load_general_corpus_model():
     VOCAB_SIZE = 32000
 
     # print(VOCAB_SIZE)
-    print("########Loading GC model!!!########")
+    print("########Loading GD model!!!########")
 
     # new_model = GeneralCorpusBertModel("klue/bert-base", num_layers=NUM_LAYERS, d_model=D_MODEL, 
     #                                     dff=DFF, num_heads=NUM_HEADS, num_labels=VOCAB_SIZE)
@@ -29,7 +29,7 @@ def load_general_corpus_model():
     new_model = GeneralDialogBertModel("klue/bert-base", num_layers=NUM_LAYERS, d_model=D_MODEL, 
                                         dff=DFF, num_heads=NUM_HEADS, num_labels=VOCAB_SIZE, dropout=DROPOUT)
 
-    new_model.load_weights(os.environ['CHATBOT_ROOT'] + "/resources/weights/Transformer_weights/General_weights.h5")
+    new_model.load_weights(os.environ['CHATBOT_ROOT'] + "/resources/weights/GeneralDialog_weights/General_weights.h5")
 
     return new_model
 
@@ -43,17 +43,11 @@ def GeneralDialogBertModel(model_name, num_layers, d_model, dff, num_heads, num_
     dec_inputs = tf.keras.Input(shape=(None,), name="dec_inputs")
 
     # bert 모델
-    # embeddings = tf.keras.layers.Embedding(VOCAB_SIZE, D_MODEL)(input_ids)
-    # embeddings *= tf.math.sqrt(tf.cast(D_MODEL, tf.float32))
-    # embeddings = PositionalEncoding(VOCAB_SIZE, D_MODEL)(embeddings)
-    # embedded = tf.keras.layers.Dropout(rate=DROPOUT)(embeddings)
 
     bertModel = TFBertModel.from_pretrained(model_name, from_pt=True)
     bertout = bertModel(input_ids=input_ids, attention_mask=attention_masks, token_type_ids=token_type_ids)
     dropout1 = tf.keras.layers.Dropout(bertModel.config.hidden_dropout_prob)(bertout[0])
     context_vec = tf.keras.layers.Dense(d_model, name="dec_input")(dropout1)
-    # dropout2 = tf.keras.layers.Dropout(rate=DROPOUT)(context_vec)
-    # normalized_vec = tf.keras.layers.LayerNormalization(epsilon=1e-6)(dropout2 + embedded)
 
     # decoder 모델
     look_ahead_mask = tf.keras.layers.Lambda(create_look_ahead_mask, output_shape=(1, None, None), name='look_ahead_mask')(dec_inputs)
@@ -62,7 +56,8 @@ def GeneralDialogBertModel(model_name, num_layers, d_model, dff, num_heads, num_
                             )(inputs=[dec_inputs, bertout[0], look_ahead_mask, dec_padding_mask])
     predictions = tf.keras.layers.Dense(units=num_labels, name="outputs")(dec_outputs)
 
-    my_model = tf.keras.Model(inputs=[input_ids, attention_masks, token_type_ids, dec_inputs], outputs=predictions, name="GeneralDialogSequenceModel")
+    my_model = tf.keras.Model(inputs=[input_ids, attention_masks, token_type_ids, dec_inputs], 
+                            outputs=predictions, name="GeneralDialogSequenceModel")
 
     return my_model
 
@@ -150,8 +145,8 @@ def GC_predict(sentence, model, tokenizer):
     predicted_sentence = tokenizer.decode(
         [i for i in prediction if (i < tokenizer.vocab_size) and (i != 2)])
 
-    print('Input: {}'.format(sentence))
-    print('Output: {}'.format(predicted_sentence))
+    # print('Input: {}'.format(sentence))
+    # print('Output: {}'.format(predicted_sentence))
 
     return predicted_sentence
 
