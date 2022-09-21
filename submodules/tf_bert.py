@@ -1,7 +1,8 @@
 from transformers import TFBertModel
 import tensorflow as tf
 
-#다대일, 감정분석
+
+# 다대일, 감정분석
 class SequenceClassification(tf.keras.Model):
     def __init__(self, model_name, num_labels):
         super(SequenceClassification, self).__init__()

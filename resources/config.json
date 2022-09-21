@@ -1,6 +1,7 @@
 {
 	"EMO-weights-version":"1.0.0",
 	"NER-weights-version":"1.0.0",
+	"THE-weights-version":"1.0.0",
 	"Transformer-weights-version":"1.0.0",
 	"EMO-index-url":"https://drive.google.com/u/0/uc?id=1nSVbVcS75vc4Kf3XKOaXhLHMWlruvq95&export=download",
 	"EMO-check-url":"https://drive.google.com/u/0/uc?id=1NC7MN8S2HW-UDFl5Bnptk5DJ4FWjKzow&export=download",
@@ -10,5 +11,12 @@
 	"NER-data-url":"https://drive.google.com/u/0/uc?id=1Q5HcqJLsWE5ZUzsnsSujQF0w8QHzsLTU&export=download",
 	"Transformer-index-url":"https://drive.google.com/u/0/uc?id=1lMc6Wx0baeC4VxI-3UuFXUCbw4OGVXXB&export=download",
 	"Transformer-check-url":"https://drive.google.com/u/0/uc?id=14hw-IYbpbJPEajYd5wWTjnw02TPoTR36&export=download",
-	"Transformer-data-url":"https://drive.google.com/u/0/uc?id=137jPMTIxu773g_AF4SPx2PjrzRGsOL_6&export=download"
+	"Transformer-data-url":"https://drive.google.com/u/0/uc?id=137jPMTIxu773g_AF4SPx2PjrzRGsOL_6&export=download",
+	"THE-model-url" : "https://drive.google.com/u/0/uc?id=1zXx4bAn7mOBqC2iClcoSRVYG5-tnFJse",
+	"THE-dict-url" : "https://drive.google.com/u/0/uc?id=19yEXHRyfMiKsWRAhSbhG-piN5dNyUGv_",
+	"THE-mm-url" : "https://drive.google.com/u/0/uc?id=1zf1-T39zCIRK54j4UrvN93YxG_p8foS5",
+	"THE-npy-url" : "https://drive.google.com/u/0/uc?id=1ve9JL9a32x-eJlbtKSGjMgIR1WUckHzG",
+	"THE-state-url" : "https://drive.google.com/u/0/uc?id=1vPmU3hdGP-1v4CKlcdPTALAVBWeUoC1c",
+	"THE-id2word-url" : "https://drive.google.com/u/0/uc?id=1rHktRcF972MzrhgfPDhaWJi7cR0o4HtY",
+	"THE-index-url" : "https://drive.google.com/u/0/uc?id=19aOxKCv5d77Cc6XK99MzztZ2gPi2smpf"
 }

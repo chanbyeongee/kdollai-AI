@@ -1,4 +1,4 @@
-import os,json
+import os, json
 
 def setup_environ():
     this_dir, this_filename = os.path.split(__file__)
@@ -11,17 +11,18 @@ def download_weights():
 
     print("Check each weights version and update if they have to.")
 
-    config_url = 'https://drive.google.com/u/0/uc?id=1lSjmYdxyLMwsVjTuFPoZ2zabQbP2f56e&export=download'
+    config_url = 'https://drive.google.com/u/0/uc?id=1eWECwZsZ_V0e2dEFrASZHaDfARV77dhG&export=download'
 
     import gdown
     this_dir = os.environ['CHATBOT_ROOT']
-    Emo_version = NER_version = Transformer_version = "1.0.0"
+    Emo_version = NER_version = THE_version = Transformer_version = "1.0.0"
 
     if os.path.isfile(this_dir+"/resources/config.json"):
         with open(this_dir+"/resources/config.json",'r') as f :
             loaded = json.load(f)
             Emo_version = loaded["EMO-weights-version"]
             NER_version = loaded["NER-weights-version"]
+            THE_version = loaded["THE-weights-version"]
             Transformer_version = loaded["Transformer-weights-version"]
 
     output = this_dir.replace("\\", "/") + "/resources/config.json"
@@ -31,9 +32,8 @@ def download_weights():
         loaded = json.load(f)
         Emo_flag = not loaded["EMO-weights-version"] == Emo_version
         NER_flag = not loaded["NER-weights-version"] == NER_version
-        Transformer_flag = not loaded['Transformer-weig' \
-                                      '' \
-                                      'hts-version'] == Transformer_version
+        THE_flag = not loaded["THE-weights-version"] == THE_version
+        Transformer_flag = not loaded['Transformer-weights-version'] == Transformer_version
 
     weight_path = this_dir.replace("\\","/") + "/resources/weights"
     if not os.path.isfile(weight_path+"/Emo_weights/Emo_weights.index") or Emo_flag:
@@ -51,6 +51,8 @@ def download_weights():
         output = weight_path+"/Emo_weights/Emo_weights.data-00000-of-00001"
         gdown.download(loaded["EMO-data-url"], output, quiet=False)
 
+
+
     if not os.path.isfile(weight_path+"/NER_weights/NER_weights.index") or NER_flag:
         print("Downloading NER pretrained index...")
         output = weight_path+"/NER_weights/NER_weights.index"
@@ -65,6 +67,27 @@ def download_weights():
         print("Downloading NER pretrained weights...")
         output = weight_path+"/NER_weights/NER_weights.data-00000-of-00001"
         gdown.download(loaded["NER-data-url"], output, quiet=False)
+
+    theme_weights = ["The_model(LDA)", "The_model(LDA).dict", "The_model(LDA).mm", "The_model(LDA).expElogbeta.npy", "The_model(LDA).state", "The_model(LDA).id2word", "The_model(LDA).index"]
+
+    for THE_weight in theme_weights:
+        if not os.path.isfile(weight_path+"/THE_weights/" + THE_weight) or THE_flag:
+            print("Downloading THE pretrained weights...")
+            output = weight_path+"/THE_weights/" + THE_weight
+            file_extension = THE_weight.split(".")
+            if len(file_extension) == 1:
+                file_extension = "model"
+            elif len(file_extension) == 2:
+                file_extension = file_extension[1]
+            else:
+                file_extension = file_extension[2]
+
+            gdown.download(loaded["THE-" + file_extension + "-url"], output, quiet=False)
+
+    if not os.path.isfile(weight_path+"/THE_weights/The_model(LDA)") or THE_flag:
+        print("Downloading THE pretrained weights...")
+        output = weight_path+"/THE_weights/The_model(LDA)"
+        gdown.download(loaded["THE-model-url"], output, quiet=False)
 
     if not os.path.isfile(weight_path+"/Transformer_weights/Transformer_weights.index") or Transformer_flag:
         print("Downloading Transformer pretrained index...")

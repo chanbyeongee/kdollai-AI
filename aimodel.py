@@ -1,6 +1,14 @@
+"""
+last modified : 220823
+modified by : Heo Yoon
+contents : (new) self.THE_model, Data["Type"] = TheOut, TheOut = the_predict((self.THE_model, inputsentence))
+new_dependencies : (module) the_classifier
+"""
+
 from submodules.emo_classifier import *
 from submodules.ner_classifier import *
 from submodules.gc_transformer import *
+from submodules.the_classifier import *
 from submodules import mGC_tokenizer
 from collections import OrderedDict
 
@@ -20,6 +28,8 @@ class AIModel:
         self.GC_model = load_general_corpus_model()
         self.NER_model = load_NER_model()
         self.EMO_model = load_Emo_model()
+        self.THE_model = load_THE_model() #(new)
+
 
 ##광명님이 말하는 자료구조로 만들어주는 함수
     def run(self, name, inputsentence):
@@ -29,6 +39,7 @@ class AIModel:
         GeneralAnswer = predict(inputsentence, self._mGC_tokenizer, self.GC_model)
         NEROut = ner_predict(self.NER_model,[inputsentence])
         EmoOut = emo_predict(self.EMO_model,[inputsentence])
+        TheOut = the_predict((self.THE_model, inputsentence)) #new
 
         NER = {}
         for (word, tag) in NEROut[0]:
@@ -39,7 +50,7 @@ class AIModel:
         Data["Input_Corpus"] = inputsentence
         Data["NER"] = NER
         Data["Emotion"] = EmoOut
-        Data["Type"] = "General"
+        Data["Type"] = TheOut
         Data["System_Corpus"] = GeneralAnswer
 
         return Data
