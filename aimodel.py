@@ -98,7 +98,7 @@ class AIModel:
 
         GeneralAnswer, Name_Entity, Emotion, Topic = self.get_results(inputsentence)
 
-        Bads = self.danger_detector.detect(inputsentence)
+        DangerFlag, Badwords = self.danger_detector.detect(inputsentence)
 
         Data["Name"] = name
         Data["Input_Corpus"] = inputsentence
@@ -107,7 +107,8 @@ class AIModel:
         Data["Topic"] = Topic
         Data["Type"] = "General"
         Data["System_Corpus"] = GeneralAnswer
-        Data["Dangers"] = Bads
+        Data["Danger_Flag"] = DangerFlag
+        Data["Danger_Words"] = Badwords
 
         return Data
 
