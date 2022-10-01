@@ -1,7 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
+<<<<<<< HEAD
     <list default="true" id="f608fd03-6394-44d0-9b30-cdf87b5a4d6d" name="Changes" comment="" />
+=======
+    <list default="true" id="f608fd03-6394-44d0-9b30-cdf87b5a4d6d" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/ToolPack/danger_detector.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/used_files/bad_embedding_BERT.pickle" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/used_files/bad_embedding_SBERT.pickle" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/used_files/bad_words.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/weights/Topic_weights/delete_before_use.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/submodules/topic_classifier.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Converters/Index_to_EmotionWord.pickle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Converters/index_to_tag.pickle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Converters/ner_label.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Converters/tokenizer.pickle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KHUAIModel/AIServer.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KHUAIModel/KHUDoll_AIModels.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/KHUAIModel/main.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/aimodel.py" beforeDir="false" afterPath="$PROJECT_DIR$/aimodel.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/resources/config.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/weights/THE_weights/delete_before_use.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/weights/Transformer_weights/delete_before_use.txt" beforeDir="false" afterPath="$PROJECT_DIR$/resources/weights/GeneralDialog_weights/delete_before_use.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/submodules/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/submodules/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/submodules/emo_classifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/submodules/emo_classifier.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/submodules/gc_transformer.py" beforeDir="false" afterPath="$PROJECT_DIR$/submodules/gd_generator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/submodules/ner_classifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/submodules/ner_classifier.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/submodules/tf_bert.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/submodules/the_classifier.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
+    </list>
+>>>>>>> 29bf2d93e1a2292720fb6620525cb3e02e7b0fee
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -16,6 +49,14 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -32,6 +73,56 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../k-doll-ai-chatbot - 복사본" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
+  <component name="RunManager" selected="Python.aimodel">
+    <configuration name="__init__" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="k-doll-ai-chatbot" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/__init__.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="aimodel" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="k-doll-ai-chatbot" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/aimodel.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.aimodel" />
+        <item itemvalue="Python.__init__" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -42,5 +133,16 @@
       <updated>1659273438643</updated>
     </task>
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>
