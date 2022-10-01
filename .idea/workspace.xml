@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
+<<<<<<< HEAD
+    <list default="true" id="f608fd03-6394-44d0-9b30-cdf87b5a4d6d" name="Changes" comment="" />
+=======
     <list default="true" id="f608fd03-6394-44d0-9b30-cdf87b5a4d6d" name="Changes" comment="">
       <change afterPath="$PROJECT_DIR$/ToolPack/danger_detector.py" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/resources/used_files/bad_embedding_BERT.pickle" afterDir="false" />
@@ -31,6 +34,7 @@
       <change beforePath="$PROJECT_DIR$/submodules/the_classifier.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
     </list>
+>>>>>>> 29bf2d93e1a2292720fb6620525cb3e02e7b0fee
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -66,7 +70,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../k-doll-ai-chatbot - 복사본" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RunManager" selected="Python.aimodel">

@@ -24,7 +24,7 @@ hobby_index_dict = {0: 5, 1: 3, 2: 4}
 broad_media_dict = {0: 6, 1: 7}
 family_health_dict = {0: 0, 1: 2}
 
-def Topic_predict(LDA_model, sentences):
+def Topic_predict(LDA_model, sentences, EmoOut):
     # 문장을 형태소 단위로 분리
     m = Mecab()
     key = m.pos(sentences)
@@ -38,7 +38,7 @@ def Topic_predict(LDA_model, sentences):
     bow = LDA_model[0].id2word.doc2bow(key_list)
     # 일치 단어 없을 시 무주제
     if not bow:  #
-        return "무주제"
+        return None, None
     # 일치 단어 있을 시 model 입력
     topic_distribution = LDA_model[0].get_document_topics(bow)
     print(topic_distribution)
@@ -52,47 +52,74 @@ def Topic_predict(LDA_model, sentences):
     if np.max(temp2) < 0.85:  # 예상 확률이 90% 미만일 때
         return None, None
     else:
-        if (topic_num == 4) or (topic_num == 5) or (topic_num == 8):  # 취미로 판정될 경우
-            bow2 = LDA_model[1].id2word.doc2bow(key_list)
-            if not bow2:
-                return None, None
-            topic_distribution = LDA_model[1].get_document_topics(bow2)
-            temp1 = []
-            temp2 = []
-            for i, j in topic_distribution:
-                temp1.append(i)
-                temp2.append(j)
-            topic_num = temp1[np.argmax(temp2)]
-            index = hobby_index_dict[topic_num]
-
-        elif (topic_num == 3) or (topic_num == 7):
-            bow3 = LDA_model[2].id2word.doc2bow(key_list)
-            if not bow3:
-                return None, None
-            topic_distribution = LDA_model[2].get_document_topics(bow3)
-            temp1 = []
-            temp2 = []
-            for i, j in topic_distribution:
-                temp1.append(i)
-                temp2.append(j)
-            topic_num = temp1[np.argmax(temp2)]
-            index = broad_media_dict[topic_num]
-
-        elif topic_num == 1:
-            bow4 = LDA_model[3].id2word.doc2bow(key_list)
-            if not bow4:
-                return None, None
-            topic_distribution = LDA_model[3].get_document_topics(bow4)
-            temp1 = []
-            temp2 = []
-            for i, j in topic_distribution:
-                temp1.append(i)
-                temp2.append(j)
-            topic_num = temp1[np.argmax(temp2)]
-            index = family_health_dict[topic_num]
-            print(index)
+        if EmoOut == "중립" or EmoOut == "기쁨":
+            if (topic_num == 4) or (topic_num == 5) or (topic_num == 8):  # 취미로 판정될 경우
+                bow2 = LDA_model[1].id2word.doc2bow(key_list)
+                if not bow2:
+                    return None, None
+                topic_distribution = LDA_model[1].get_document_topics(bow2)
+                temp1 = []
+                temp2 = []
+                for i, j in topic_distribution:
+                    temp1.append(i)
+                    temp2.append(j)
+                topic_num = temp1[np.argmax(temp2)]
+                index = hobby_index_dict[topic_num]
+            elif (topic_num == 3) or (topic_num == 7):
+                bow3 = LDA_model[2].id2word.doc2bow(key_list)
+                if not bow3:
+                    return None, None
+                topic_distribution = LDA_model[2].get_document_topics(bow3)
+                temp1 = []
+                temp2 = []
+                for i, j in topic_distribution:
+                    temp1.append(i)
+                    temp2.append(j)
+                topic_num = temp1[np.argmax(temp2)]
+                index = broad_media_dict[topic_num]
+            if topic_num == 1:
+                bow4 = LDA_model[3].id2word.doc2bow(key_list)
+                if not bow4:
+                    return None, None
+                topic_distribution = LDA_model[3].get_document_topics(bow4)
+                temp1 = []
+                temp2 = []
+                for i, j in topic_distribution:
+                    temp1.append(i)
+                    temp2.append(j)
+                topic_num = temp1[np.argmax(temp2)]
+                index = family_health_dict[topic_num]
+            else:
+                index = topic_index_dict[topic_num]
         else:
-            index = topic_index_dict[topic_num]
+            if topic_num == 1:
+                bow4 = LDA_model[3].id2word.doc2bow(key_list)
+                if not bow4:
+                    return None, None
+                topic_distribution = LDA_model[3].get_document_topics(bow4)
+                temp1 = []
+                temp2 = []
+                for i, j in topic_distribution:
+                    temp1.append(i)
+                    temp2.append(j)
+                topic_num = temp1[np.argmax(temp2)]
+                index = family_health_dict[topic_num]
+                print(index)
+            elif topic_num != 10:
+                bow1 = LDA_model[0].id2word.doc2bow(key_list)
+                if not bow1:
+                    return None, None
+                topic_distribution = LDA_model[0].get_document_topics(bow1)
+                temp1 = []
+                temp2 = []
+                for i, j in topic_distribution:
+                    if i == 1 or i == 10:
+                        temp1.append(i)
+                        temp2.append(j)
+                topic_num = temp1[np.argmax(temp2)]
+                index = topic_index_dict[topic_num]
+            else:
+                index = topic_index_dict[topic_num]
 
         if np.max(temp2) > 0.9:
             main_topic = main_topic_label[index]
