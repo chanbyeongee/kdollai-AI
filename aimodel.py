@@ -55,10 +55,6 @@ class AIModel:
                 self.dialog_buffer.pop(0)
             return True
 
-        # elif len(self.dialog_buffer) > 4:
-        #     while len(self.dialog_buffer) != 1:
-        #         self.dialog_buffer.pop(0)
-        #     return False
 
     def get_results(self, inputsentence):
         dialogs = ""
@@ -76,18 +72,8 @@ class AIModel:
         print(len(self.dialog_buffer))
 
         if self.manage_dailogbuffer() is True:
-            (main_topic, sub_topic) = Topic_predict(self.Topic_model, dialogs)
-        #     if EmoOut == '불만' or EmoOut == '당혹' or EmoOut == '걱정' or EmoOut == '질투' or EmoOut == '슬픔' \
-        #         or EmoOut == '죄책감' or EmoOut == '연민':
-        #         topic_index = np.argmax(topic_prob_vec[0][:7])
-        #         altered_topic_output = self._topic_converter[topic_index]
-        #         Topic = altered_topic_output
-        #     else:
-        #         altered_topic_output = 'None'
-        #         Topic = initial_topic_output
-        # else:
-        #     Topic = "None"
-        else :
+            (main_topic, sub_topic) = Topic_predict(self.Topic_model, dialogs, EmoOut)
+        else:
             main_topic = None
             sub_topic = None
         self.dialog_buffer.append(GeneralAnswer)
@@ -131,5 +117,5 @@ class AIModel:
 D = load_Topic_model()
 while True:
     sample = input("입력 : ")
-    topic, subtopic = Topic_predict(D, sample)
+    topic, subtopic = Topic_predict(D, sample, "슬픔")
     print(topic, subtopic)
