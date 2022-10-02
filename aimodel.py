@@ -50,7 +50,7 @@ class AIModel:
         elif len(self.dialog_buffer) == 3:
             return True
 
-        elif len(self.dialog_buffer) == 5:
+        else:
             while len(self.dialog_buffer) != 3:
                 self.dialog_buffer.pop(0)
             return True
@@ -59,7 +59,7 @@ class AIModel:
     def get_results(self, inputsentence):
         dialogs = ""
         for dialog in self.dialog_buffer:
-            dialogs += dialog
+            dialogs += " " + dialog
 
         GeneralAnswer = GC_predict(inputsentence, self.GC_model, self._mTokenizer)
         NEROut = ner_predict(self.NER_model,[inputsentence])
@@ -73,10 +73,10 @@ class AIModel:
 
         if self.manage_dailogbuffer() is True:
             (main_topic, sub_topic) = Topic_predict(self.Topic_model, dialogs, EmoOut)
+            print(dialogs)
         else:
             main_topic = None
             sub_topic = None
-        self.dialog_buffer.append(GeneralAnswer)
 
         return GeneralAnswer, NER, EmoOut, main_topic, sub_topic
 
@@ -103,19 +103,21 @@ class AIModel:
 
         return Data
 
-# DoDam = AIModel()
-#
-# DoDam.model_loader()
-#
-# UserName = "민채"
-#
-# while True:
-#     sample = input("입력 : ")
-#     output = DoDam.run(UserName, sample)
-#     print("출력 : {}" .format(output))
+DoDam = AIModel()
 
-D = load_Topic_model()
+DoDam.model_loader()
+
+UserName = "민채"
+
 while True:
     sample = input("입력 : ")
-    topic, subtopic = Topic_predict(D, sample, "슬픔")
-    print(topic, subtopic)
+    output = DoDam.run(UserName, sample)
+    print("출력 : {}" .format(output))
+
+
+# A = load_Topic_model()
+# while True:
+#     sample = input("입력 : ")
+#     a, b = Topic_predict(A, sample, "슬픔")
+#     print("출력 : {}, {}" .format(a,b))
+
