@@ -78,7 +78,12 @@ class AIModel:
             main_topic = None
             sub_topic = None
 
-        return GeneralAnswer, NER, EmoOut, main_topic, sub_topic
+        if main_topic in ["가족", "건강", "학교"]:
+            TypeOut = "Scenario"
+        else:
+            TypeOut = "General"
+
+        return GeneralAnswer, NER, EmoOut, main_topic, sub_topic, TypeOut
 
 ##광명님이 말하는 자료구조로 만들어주는 함수
     def run(self, name, inputsentence):
@@ -86,7 +91,7 @@ class AIModel:
         Data = OrderedDict()
         self.dialog_buffer.append(inputsentence)
 
-        GeneralAnswer, Name_Entity, Emotion, main_topic, sub_topic = self.get_results(inputsentence)
+        GeneralAnswer, Name_Entity, Emotion, main_topic, sub_topic, TypeOut = self.get_results(inputsentence)
 
         DangerFlag, Badwords = self.danger_detector.detect(inputsentence)
 
@@ -96,7 +101,7 @@ class AIModel:
         Data["Emotion"] = Emotion
         Data["Topic"] = main_topic
         Data["Sub_Topic"] = sub_topic
-        Data["Type"] = "General"
+        Data["Type"] = TypeOut
         Data["System_Corpus"] = GeneralAnswer
         Data["Danger_Flag"] = DangerFlag
         Data["Danger_Words"] = Badwords
