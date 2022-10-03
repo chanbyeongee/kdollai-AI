@@ -1,5 +1,11 @@
-from submodules.emo_classifier import *
-from submodules.ner_classifier import *
-from submodules.gd_generator import *
-from submodules.topic_classifier import *
+try :
+    from emo_classifier import *
+    from ner_classifier import *
+    from gd_generator import *
+    from topic_classifier import *
+except Exception :
+    from .emo_classifier import *
+    from .ner_classifier import *
+    from .gd_generator import *
+    from .topic_classifier import *
 

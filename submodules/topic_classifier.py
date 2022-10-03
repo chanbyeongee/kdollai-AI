@@ -112,39 +112,6 @@ def Topic_predict(LDA_model, sentences, EmoOut):
     prob = np.max(temp2)
     if np.max(temp2) < 0.85:  # 예상 확률이 85% 미만일 때
         return None, None
-    elif np.max(temp2) < 0.99:  # 예상 확률이 85 ~ 92% 사이에 있을 때(재예측 알고리즘 가동)
-        if EmoOut == "중립" or EmoOut == "기쁨":
-            if (topic_num == 4) or (topic_num == 5) or (topic_num == 8):  # 취미로 판정될 경우
-                index, prob = Hobby_predict((LDA_model, key_list))
-            elif (topic_num == 3) or (topic_num == 7):
-                index, prob = Media_predict(LDA_model, key_list)
-            elif topic_num == 1:
-                index, prob = Family_Health_predict(LDA_model, key_list)
-            else:
-                index = topic_index_dict[topic_num]
-
-            if prob > 0.9:
-                main_topic = main_topic_label[index]
-                sub_topic = sub_topic_label[index]
-                return main_topic, sub_topic
-            else:
-                return None, None
-        # 재예측 알고리즘
-        else:
-            if topic_num == 1:
-                index, prob = Family_Health_predict(LDA_model, key_list)
-            elif topic_num != 10:
-                index = Consultant_predict(LDA_model, key_list)
-            else:
-                index = topic_index_dict[topic_num]
-
-            if prob > 0.9:
-                main_topic = main_topic_label[index]
-                sub_topic = sub_topic_label[index]
-                return main_topic, sub_topic
-            else:
-                return None, None
-
     else:  # 예상 확률이 99% 이상일 경우, 재예측 X(크게 확신하므로)
         if (topic_num == 4) or (topic_num == 5) or (topic_num == 8):  # 취미로 판정
             index, prob = Hobby_predict(LDA_model, key_list)
@@ -162,14 +129,13 @@ def Topic_predict(LDA_model, sentences, EmoOut):
         else:
             return None, None
 
-
 def load_Topic_model():
     print("########Loading THE model!!!########")
     save_dir = datapath(os.environ['CHATBOT_ROOT'] + "/resources/weights/Topic_weights/")  # 토픽 모델 저장소
     main_model = LdaModel.load(save_dir + "LDA_model_topic11(Hanieum)")
-    sub_consultant_model = LdaModel.load(save_dir + "LDA_model_consultant")
+    #sub_consultant_model = LdaModel.load(save_dir + "LDA_model_consultant")
     sub_hobby_model = LdaModel.load(save_dir + "LDA_hobby")
     sub_media_model = LdaModel.load(save_dir + "LDA_media")
     sub_family_health_model = LdaModel.load(save_dir + "LDA_family_health")
 
-    return main_model, sub_hobby_model, sub_media_model, sub_family_health_model, sub_consultant_model
+    return main_model, sub_hobby_model, sub_media_model, sub_family_health_model#, sub_consultant_model
