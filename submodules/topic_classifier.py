@@ -162,7 +162,6 @@ def Topic_predict(LDA_model, sentences, EmoOut):
         else:
             return None, None
 
-
 def load_Topic_model():
     print("########Loading THE model!!!########")
     save_dir = datapath(os.environ['CHATBOT_ROOT'] + "/resources/weights/Topic_weights/")  # 토픽 모델 저장소
