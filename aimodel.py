@@ -4,7 +4,6 @@ modified by : Heo Yoon
 contents : (new) topic_classfier using LDA, solve the conflict
 new_dependencies : (module) the_classifier
 """
-
 try :
     from setup import setup_environ
     import os
@@ -70,7 +69,7 @@ class AIModel:
         for dialog in self.dialog_buffer:
             dialogs += " " + dialog
 
-        GeneralAnswer = GC_predict(inputsentence, self.GC_model, self._mTokenizer)
+        GeneralAnswer = GD_predict(inputsentence, self.GC_model, self._mTokenizer)
         NEROut = ner_predict(self.NER_model,[inputsentence])
         EmoOut = emo_predict(self.EMO_model,[inputsentence])
 
@@ -78,7 +77,7 @@ class AIModel:
         for (word, tag) in NEROut:
             NER[word] = tag
 
-        print(len(self.dialog_buffer))
+        # print(len(self.dialog_buffer))
 
         if self.manage_dailogbuffer() is True:
             (main_topic, sub_topic) = Topic_predict(self.Topic_model, dialogs, EmoOut)
@@ -130,10 +129,4 @@ if __name__ == "__main__":
         output = DoDam.run(UserName, sample)
         print("출력 : {}" .format(output))
 
-
-    # A = load_Topic_model()
-    # while True:
-    #     sample = input("입력 : ")
-    #     a, b = Topic_predict(A, sample, "슬픔")
-    #     print("출력 : {}, {}" .format(a,b))
 
