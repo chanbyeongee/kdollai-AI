@@ -4,25 +4,32 @@ modified by : Heo Yoon
 contents : (new) topic_classfier using LDA, solve the conflict
 new_dependencies : (module) the_classifier
 """
-from setup import *
+try :
+    from setup import setup_environ
+    import os
 
-setup_environ()
-download_weights()
+    setup_environ()
+    # CPU만 사용
+    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+    # GPU log 설정
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
+    from submodules import *
+    from ToolPack.danger_detector import *
+    from collections import OrderedDict
+
+except Exception :
+    from .submodules import *
+    from .ToolPack.danger_detector import *
+    from collections import OrderedDict
+    pass
 
 ## device 관련 설정
-import os
 
-# CPU만 사용
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-# GPU log 설정
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 
-from submodules.emo_classifier import *
-from submodules.ner_classifier import *
-from submodules.gd_generator import *
-from submodules.topic_classifier import *
-from ToolPack.danger_detector import *
-from collections import OrderedDict
+
+
+
 
 ## 가중치만 만들고 불러오는게 안전하다
 ##모델 만들어오는 함수들
@@ -109,20 +116,17 @@ class AIModel:
 
         return Data
 
-DoDam = AIModel()
+if __name__ == "__main__":
 
-DoDam.model_loader()
+    DoDam = AIModel()
 
-UserName = "민채"
+    DoDam.model_loader()
 
-while True:
-    sample = input("입력 : ")
-    output = DoDam.run(UserName, sample)
-    print("출력 : {}" .format(output))
+    UserName = "민채"
 
-# A = load_Topic_model()
-# while True:
-#     sample = input("입력 : ")
-#     a, b = Topic_predict(A, sample, "슬픔")
-#     print("출력 : {}, {}" .format(a,b))
+    while True:
+        sample = input("입력 : ")
+        output = DoDam.run(UserName, sample)
+        print("출력 : {}" .format(output))
+
 
