@@ -50,7 +50,7 @@ class AIModel:
         elif len(self.dialog_buffer) == 3:
             return True
 
-        elif len(self.dialog_buffer) == 5:
+        else:
             while len(self.dialog_buffer) != 3:
                 self.dialog_buffer.pop(0)
             return True
@@ -59,7 +59,7 @@ class AIModel:
     def get_results(self, inputsentence):
         dialogs = ""
         for dialog in self.dialog_buffer:
-            dialogs += dialog
+            dialogs += " " + dialog
 
         GeneralAnswer = GC_predict(inputsentence, self.GC_model, self._mTokenizer)
         NEROut = ner_predict(self.NER_model,[inputsentence])
@@ -73,12 +73,17 @@ class AIModel:
 
         if self.manage_dailogbuffer() is True:
             (main_topic, sub_topic) = Topic_predict(self.Topic_model, dialogs, EmoOut)
+            print(dialogs)
         else:
             main_topic = None
             sub_topic = None
-        self.dialog_buffer.append(GeneralAnswer)
 
-        return GeneralAnswer, NER, EmoOut, main_topic, sub_topic
+        if main_topic in ["가족", "건강", "학교"]:
+            TypeOut = "Scenario"
+        else:
+            TypeOut = "General"
+
+        return GeneralAnswer, NER, EmoOut, main_topic, sub_topic, TypeOut
 
 ##광명님이 말하는 자료구조로 만들어주는 함수
     def run(self, name, inputsentence):
@@ -86,7 +91,7 @@ class AIModel:
         Data = OrderedDict()
         self.dialog_buffer.append(inputsentence)
 
-        GeneralAnswer, Name_Entity, Emotion, main_topic, sub_topic = self.get_results(inputsentence)
+        GeneralAnswer, Name_Entity, Emotion, main_topic, sub_topic, TypeOut = self.get_results(inputsentence)
 
         DangerFlag, Badwords = self.danger_detector.detect(inputsentence)
 
@@ -96,26 +101,28 @@ class AIModel:
         Data["Emotion"] = Emotion
         Data["Topic"] = main_topic
         Data["Sub_Topic"] = sub_topic
-        Data["Type"] = "General"
+        Data["Type"] = TypeOut
         Data["System_Corpus"] = GeneralAnswer
         Data["Danger_Flag"] = DangerFlag
         Data["Danger_Words"] = Badwords
 
         return Data
 
-# DoDam = AIModel()
-#
-# DoDam.model_loader()
-#
-# UserName = "민채"
-#
-# while True:
-#     sample = input("입력 : ")
-#     output = DoDam.run(UserName, sample)
-#     print("출력 : {}" .format(output))
+DoDam = AIModel()
 
-D = load_Topic_model()
+DoDam.model_loader()
+
+UserName = "민채"
+
 while True:
     sample = input("입력 : ")
-    topic, subtopic = Topic_predict(D, sample, "슬픔")
-    print(topic, subtopic)
+    output = DoDam.run(UserName, sample)
+    print("출력 : {}" .format(output))
+
+
+# A = load_Topic_model()
+# while True:
+#     sample = input("입력 : ")
+#     a, b = Topic_predict(A, sample, "슬픔")
+#     print("출력 : {}, {}" .format(a,b))
+
