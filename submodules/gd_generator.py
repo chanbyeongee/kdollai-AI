@@ -11,10 +11,10 @@ mTokenizer = BertTokenizer.from_pretrained("klue/bert-base")
 
 def load_general_corpus_model():
 
-    D_MODEL = 768
-    NUM_LAYERS = 6
-    NUM_HEADS = 24
-    DFF = 2048
+    D_MODEL = 256
+    NUM_LAYERS = 8
+    NUM_HEADS = 16
+    DFF = 1024
     DROPOUT = 0.1
     VOCAB_SIZE = 32000
 
@@ -35,115 +35,37 @@ def load_general_corpus_model():
 
 def GeneralDialogBertModel(model_name, num_layers, d_model, dff, num_heads, num_labels, dropout):
 
+    # bert 입력
     input_ids = tf.keras.Input(shape=(128,), dtype=tf.int64, name="input_ids")
-    attention_masks = tf.keras.Input(shape=(128,), dtype=tf.int64, name="attention_masks")
-    token_type_ids = tf.keras.Input(shape=(128,), dtype=tf.int64, name="token_type_ids")
 
     # decoder 입력
     dec_inputs = tf.keras.Input(shape=(None,), name="dec_inputs")
 
-    # bert 모델
-
-    bertModel = TFBertModel.from_pretrained(model_name, from_pt=True)
-    bertout = bertModel(input_ids=input_ids, attention_mask=attention_masks, token_type_ids=token_type_ids)
-    dropout1 = tf.keras.layers.Dropout(bertModel.config.hidden_dropout_prob)(bertout[0])
-    context_vec = tf.keras.layers.Dense(d_model, name="dec_input")(dropout1)
+    # Embedding vector
+    embeddings = tf.keras.layers.Embedding(num_labels, 768)(input_ids)
+    embeddings *= tf.math.sqrt(tf.cast(768, tf.float32))
+    embeddings = PositionalEncoding(num_labels, 768)(embeddings)
+    embedded = tf.keras.layers.Dropout(rate=dropout)(embeddings)
+    context_vec = tf.keras.layers.Dense(d_model, name="embedding_vec")(embedded)
 
     # decoder 모델
     look_ahead_mask = tf.keras.layers.Lambda(create_look_ahead_mask, output_shape=(1, None, None), name='look_ahead_mask')(dec_inputs)
     dec_padding_mask = tf.keras.layers.Lambda(create_padding_mask, output_shape=(1, 1, None), name='dec_padding_mask')(input_ids)
     dec_outputs = decoder(vocab_size=num_labels, num_layers=num_layers, dff=dff, d_model=d_model, num_heads=num_heads, dropout=dropout,
-                            )(inputs=[dec_inputs, bertout[0], look_ahead_mask, dec_padding_mask])
+                        )(inputs=[dec_inputs, context_vec, look_ahead_mask, dec_padding_mask])
     predictions = tf.keras.layers.Dense(units=num_labels, name="outputs")(dec_outputs)
 
-    my_model = tf.keras.Model(inputs=[input_ids, attention_masks, token_type_ids, dec_inputs], 
-                            outputs=predictions, name="GeneralDialogSequenceModel")
-
+    my_model = tf.keras.Model(inputs=[input_ids, dec_inputs], outputs=predictions, name="GeneralDialogSequenceModel")
+    
     return my_model
 
-
-# class GeneralCorpusBertModel(tf.keras.Model):
-#     def __init__(self, model_name, num_layers, d_model, dff, num_heads, num_labels):
-#         super(GeneralCorpusBertModel, self).__init__()
-        
-#         ## bert encoder
-#         self.bert = TFBertModel.from_pretrained(model_name, from_pt=True)
-#         self.dropout = tf.keras.layers.Dropout(self.bert.config.hidden_dropout_prob)
-#         self.context_vec = tf.keras.layers.Dense(d_model, name="dec_input")
-
-#         ## decoder
-#         self.look_ahead_mask = tf.keras.layers.Lambda(create_look_ahead_mask, output_shape=(1, None, None), name='look_ahead_mask')
-#         self.dec_padding_mask = tf.keras.layers.Lambda(create_padding_mask, output_shape=(1, 1, None), name='dec_padding_mask')
-#         self.decoder = decoder(vocab_size=num_labels, num_layers=num_layers, dff=dff, d_model=d_model, num_heads=num_heads, dropout=0.1,)
-#         self.classifier = tf.keras.layers.Dense(num_labels,
-#                                                 kernel_initializer=tf.keras.initializers.TruncatedNormal(self.bert.config.initializer_range),
-#                                                 name='classifier')
-
-#         # self.input_ids = tf.keras.Input(shape=(128,), dtype=tf.int64, name="input_ids")
-#         # self.attention_masks = tf.keras.Input(shape=(128,), dtype=tf.int64, name="attention_masks")
-#         # self.token_type_ids = tf.keras.Input(shape=(128,), dtype=tf.int64, name="token_type_ids")
-
-#         # self.dec_inputs = tf.keras.Input(shape=(None,), name="dec_inputs")
-
-#         # self.bertModel = TFBertModel.from_pretrained("klue/bert-base", from_pt=True)
-#         # self.bertout = self.bertModel(input_ids=self.input_ids, attention_mask=self.attention_masks, token_type_ids=self.token_type_ids)
-#         # self.dropout1 = tf.keras.layers.Dropout(self.bertModel.config.hidden_dropout_prob)(self.bertout[0])
-#         # self.context_vec = tf.keras.layers.Dense(d_model, name="dec_input")(self.dropout1)
-
-#         # self.look_ahead_mask = tf.keras.layers.Lambda(create_look_ahead_mask, output_shape=(1, None, None), name='look_ahead_mask')(self.dec_inputs)
-#         # self.dec_padding_mask = tf.keras.layers.Lambda(create_padding_mask, output_shape=(1, 1, None), name='dec_padding_mask')(self.input_ids)
-#         # self.dec_outputs = decoder(vocab_size=VOCAB_SIZE, num_layers=num_layers, dff=dff, d_model=d_model, num_heads=num_heads, dropout=0.1,
-#         #                         )(inputs=[self.dec_inputs, self.bertout[0], self.look_ahead_mask, self.dec_padding_mask])
-#         # self.predictions = tf.keras.layers.Dense(units=VOCAB_SIZE, name="outputs")(self.dec_outputs)
-
-#         # self.model = tf.keras.Model(inputs=[input_ids, attention_masks, token_type_ids, dec_inputs], outputs=predictions, name="GeneralDialogSequenceModel")
-
-    
-#     def make_attention_masks(self, enc_inputs):
-#         attention_masks = []
-#         for enc_input in enc_inputs:
-#           count = 0
-#           for index in enc_input:
-#             if index != 0:
-#               count += 1
-#           attention_mask = [1] * count
-#           attention_masks.append(attention_mask)
-
-#         attention_masks = pad_sequences(attention_masks, padding='post', maxlen=128)
-#         attention_masks = np.array(attention_masks, dtype=int)
-        
-#         return attention_masks
-
-#     def make_token_type_ids(self, enc_inputs):
-#         print(enc_inputs)
-#         token_type_ids = [0] * 128
-#         token_type_ids = np.array(token_type_ids, dtype=int)
-
-#         return token_type_ids
-
-#     def call(self, inputs):
-#         (input_ids, attention_mask, token_type_ids), decoder_input = inputs
-
-#         ## bert encoder
-#         bertout = self.bert(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
-#         dropped = self.dropout(bertout[0], training=False)
-#         encoder_out = self.context_vec(dropped)
-
-#         ## decoder
-#         look_ahead_mask = self.look_ahead_mask(decoder_input)
-#         dec_padding_mask = self.dec_padding_mask(input_ids)
-#         decoder_out = self.decoder([decoder_input, encoder_out, look_ahead_mask, dec_padding_mask])
-#         prediction = self.classifier(decoder_out)
-
-#         return prediction
-
-def GC_predict(sentence, model, tokenizer):
+def GD_predict(sentence, model, tokenizer):
     prediction = make_datasets_for_prediction(sentence, model, tokenizer)
 
     # prediction == 디코더가 리턴한 챗봇의 대답에 해당하는 정수 시퀀스
     # tokenizer.decode()를 통해 정수 시퀀스를 문자열로 디코딩.
     predicted_sentence = tokenizer.decode(
-        [i for i in prediction if (i < tokenizer.vocab_size) and (i != 2)])
+        [i for i in prediction if i < tokenizer.vocab_size])
 
     # print('Input: {}'.format(sentence))
     # print('Output: {}'.format(predicted_sentence))
@@ -154,13 +76,13 @@ def make_datasets_for_prediction(sentence, model, tokenizer):
 
     SEP = [2]
     CLS = [3]
-    
+
     tokenized = tokenizer.encode(sentence)
 
     # 입력 문장에 시작 토큰과 종료 토큰을 추가
     sentence = tf.expand_dims( tokenized + [0] * (128-len(tokenized)), axis=0 )
-    position = tf.expand_dims( [1] * len(tokenized) + [0] * (128-len(tokenized)), axis=0 )
-    segment = tf.expand_dims( [0] * 128, axis=0 )
+    # position = tf.expand_dims( [1] * len(tokenized) + [0] * (128-len(tokenized)), axis=0 )
+    # segment = tf.expand_dims( [0] * 128, axis=0 )
 
     output = tf.expand_dims(SEP, 0)
 
@@ -169,9 +91,10 @@ def make_datasets_for_prediction(sentence, model, tokenizer):
     # print(segment)
     # print(output)
 
-    # 디코더의 예측 시작
+  # 디코더의 예측 시작
     for i in range(128):
-        predictions = model(inputs=[sentence, position, segment, output], training=False)
+        # predictions = model(inputs=[sentence, position, segment, output], training=False)
+        predictions = model(inputs=[sentence, output], training=False)
 
         # 현재 시점의 예측 단어를 받아온다.
         predictions = predictions[:, -1:, :]
@@ -186,10 +109,9 @@ def make_datasets_for_prediction(sentence, model, tokenizer):
         output = tf.concat([output, predicted_id], axis=-1)
         # print(output)
 
-    # 단어 예측이 모두 끝났다면 output을 리턴.
+  # 단어 예측이 모두 끝났다면 output을 리턴.
     return tf.squeeze(output, axis=0)
 
-##Transformer임 일반대화를 위함임!
 class PositionalEncoding(tf.keras.layers.Layer):
     def __init__(self, position, d_model):
         super(PositionalEncoding, self).__init__()
@@ -406,4 +328,3 @@ def decoder(vocab_size, num_layers, dff,
         inputs=[inputs, enc_outputs, look_ahead_mask, padding_mask],
         outputs=outputs,
         name=name)
-
