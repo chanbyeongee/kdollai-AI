@@ -8,7 +8,7 @@ new_dependencies(ex. lib) : (new_folder)resources/the_weights
 
 from gensim.models.ldamodel import LdaModel
 from gensim.test.utils import datapath
-from eunjeon import Mecab
+from konlpy.tag import Mecab
 import os
 import numpy as np
 

@@ -26,11 +26,6 @@ except Exception :
 
 ## device 관련 설정
 
-
-
-
-
-
 ## 가중치만 만들고 불러오는게 안전하다
 ##모델 만들어오는 함수들
 
@@ -92,6 +87,21 @@ class AIModel:
             TypeOut = "General"
 
         return GeneralAnswer, NER, EmoOut, main_topic, sub_topic, TypeOut
+
+# 분석은 더미데이터로
+
+# 감정 시나리오
+# 6개 정도 가다가
+
+# 주제 시나리오
+#
+
+## 나 오늘 너무 슬퍼
+# 무슨일 있어?, 더 자세히말해줄래, 슬프겠다... 더 말해줄수있어?
+# 나 오늘 친구랑 싸웠어
+# 유저 인풋 3가지
+#
+
 
 ##광명님이 말하는 자료구조로 만들어주는 함수
     def run(self, name, inputsentence):
