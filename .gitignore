@@ -9,3 +9,5 @@
 /resources/weights/Topic_weights/
 
 /resources/weights/NER_weights/
+
+/resources/config.json
