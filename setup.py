@@ -92,7 +92,7 @@ def download_weights():
         with ZipFile(weight_path + "/Topic_weights/Main_topic.zip", "r") as z:
             z.extractall(weight_path + "/Topic_weights")
 
-    if not os.path.isfile(weight_path + "/Topic_weightss/Sub_topic.zip") or TOPIC_flag:
+    if not os.path.isfile(weight_path + "/Topic_weights/Sub_topic.zip") or TOPIC_flag:
         print("Downloading Transformer pretrained index...")
         output = weight_path + "/Topic_weights/Sub_topic.zip"
         gdown.download(loaded["Sub-model-url"], output, quiet=False)
