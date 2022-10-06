@@ -66,7 +66,7 @@
 
 ## 🔒 LICENSE
 
-[MIT License](https://lab.hanium.or.kr/22_HF311/k-doll-web-front/-/blob/master/LICENSE)
+[MIT License](https://lab.hanium.or.kr/22_HF311/k-doll-ai-chatbot/-/blob/master/LICENSE)
 
 
 
