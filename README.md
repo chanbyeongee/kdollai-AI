@@ -11,10 +11,14 @@
 ## 💻 Developers
 <div align="center">
     <table border="1">
-        <th><a href="https://github.com/L2HYUNN">이동현</a></th>
+        <th><a href="https://github.com/HeoYoon1">허윤</a></th>
+        <th><a href="https://github.com/pangthing">박광명</a></th>
         <tr>
             <td>
-                <img src="https://github.com/L2HYUNN.png" width='80' />
+                <img src="https://github.com/HeoYoon1.png" width='80' />
+            <td>
+                <img src="https://github.com/pangthing.png" width='80' />
+            </td>
             </td>
         </tr>
     </table>
@@ -23,41 +27,38 @@
 ## 🔨 Environment
 
 ##### Language 
-<img src="https://img.shields.io/badge/Javascript-F7DF1E?style=flat-square&logo=Javascript&logoColor=black">
+<img src="https://img.shields.io/badge/python-3670A0?style=flat-square&logo=python&logoColor=ffdd54">
 
 
 ##### Library
 
 
-<img src="https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=React&logoColor=black">
-
-
-<br/>
-
-<img src="https://img.shields.io/badge/React&nbsp;Query-FF4154?style=flat-square&logo=ReactQuery&logoColor=black">
-<img src="https://img.shields.io/badge/Recoil-3578E5?style=flat-square&logo=Recoil&logoColor=black">
+<img src="https://img.shields.io/badge/PyTorch-%23EE4C2C.svg?style=flat-square&logo=PyTorch&logoColor=white">
 
 <br/>
 
-<img src="https://img.shields.io/badge/React&nbsp;Router-CA4245?style=flat-square&logo=ReactRouter&logoColor=black">
-<img src="https://img.shields.io/badge/React&nbsp;Hook&nbsp;Form-EC5990?style=flat-square&logo=ReactHookForm&logoColor=black">
+<img src="https://img.shields.io/badge/numpy-%23013243.svg?style=flat-square&logo=numpy&logoColor=white">
+<img src="https://img.shields.io/badge/TensorFlow-%23FF6F00.svg?style=flat-square&logo=TensorFlow&logoColor=white">
 
 
 ##### Communication
   <img src="https://img.shields.io/badge/Collabee-bd9419?style=flat-square&logo=collabee&logoColor=white"/> <img src="https://img.shields.io/badge/GitLab-FC6D26?style=flat-square&logo=GitLab&logoColor=white"/>
 
-##### Deployment
-<img src="https://img.shields.io/badge/Amazon&nbsp;EC2-FF9900?style=flat-square&logo=AmazonEC2&logoColor=black"/>
+##### Development
+<img src="https://img.shields.io/badge/pycharm-143?style=flat-square&logo=pycharm&logoColor=black&color=black&labelColor=green"/>
+<img src="https://img.shields.io/badge/jupyter-%23FA0F00.svg?style=flat-square&logo=jupyter&logoColor=white"/>
+<img src="https://img.shields.io/badge/-colab-blue?style=flat-square&logo=googlecolab"/>
+
 
 
 
 ## ⚙️ Project Settings
 
-#### Install npm  dependencies
+#### Install Library
 
-```bash
-> npm install
-```
+````console
+> pip install requirements.txt
+````
 
 
 ## 📚 Documentations
@@ -65,7 +66,7 @@
 
 ## 🔒 LICENSE
 
-[MIT License](https://lab.hanium.or.kr/22_HF311/k-doll-web-front/-/blob/master/LICENSE)
+[MIT License](https://lab.hanium.or.kr/22_HF311/k-doll-ai-chatbot/-/blob/master/LICENSE)
 
 
 
