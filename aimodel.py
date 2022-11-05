@@ -31,7 +31,7 @@ except Exception :
 
 class AIModel:
     cnt = 0
-    state = 0
+    state = "general"
 
     def __init__(self):
         self.get_converters()
@@ -41,6 +41,12 @@ class AIModel:
         Topic_predict(self.Topic_model, "안녕", "기쁨")
         ner_predict(self.NER_model, "[안녕]")
         GD_predict("안녕", self.GC_model, self._mTokenizer)
+        self.danger_detector.detect("안녕")
+        yes_no_predict(self.yes_no_model, "안녕")
+
+    def set_init(self):
+        self.cnt = 0
+        self.state = "general"
 
     def get_converters(self):
         self._mTokenizer = mTokenizer
