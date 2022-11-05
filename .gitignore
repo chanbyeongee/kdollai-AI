@@ -10,6 +10,8 @@
 
 /resources/weights/NER_weights/
 
+/resources/weights/Yes_no_weights/
+
 /resources/config.json
 
 *.pyc
