@@ -12,6 +12,9 @@ from konlpy.tag import Okt
 import os
 import numpy as np
 
+topic_label = {0: "가족", 1: "학교", 2: "건강", 3: "스포츠_레저", 4: "여행", 5: "게임",
+                    6: "방송_연예", 7: "영화_만화", 8: "날씨_및_계절", 9: "반려동물", 10: "식음료"}
+
 main_topic_label = {0: "가족", 1: "학교", 2: "건강", 3: "취미", 4: "취미", 5: "취미",
                     6: "방송_미디어", 7: "방송_미디어", 8: "날씨_및_계절", 9: "반려동물", 10: "식음료"}
 
@@ -98,10 +101,9 @@ def Topic_predict(LDA_model, sentences, EmoOut):
     bow = LDA_model[0].id2word.doc2bow(key_list)
     # 일치 단어 없을 시 무주제
     if not bow:  #
-        return None, None
+        return None
     # 일치 단어 있을 시 model 입력
     topic_distribution = LDA_model[0].get_document_topics(bow)
-    print(topic_distribution)
     temp1 = []  # topic number 저장
     temp2 = []  # topic probability 저장
     for num, prob in topic_distribution:
@@ -111,7 +113,7 @@ def Topic_predict(LDA_model, sentences, EmoOut):
     topic_num = temp1[np.argmax(temp2)]
     prob = np.max(temp2)
     if np.max(temp2) < 0.85:  # 예상 확률이 85% 미만일 때
-        return None, None
+        return None
 
     else:  # 예상 확률이 99% 이상일 경우, 재예측 X(크게 확신하므로)
         if (topic_num == 4) or (topic_num == 5) or (topic_num == 8):  # 취미로 판정
@@ -124,11 +126,10 @@ def Topic_predict(LDA_model, sentences, EmoOut):
             index = topic_index_dict[topic_num]
 
         if prob > 0.9:
-            main_topic = main_topic_label[index]
-            sub_topic = sub_topic_label[index]
-            return main_topic, sub_topic
+            topic = topic_label[index]
+            return topic
         else:
-            return None, None
+            return None
 
 """
     elif np.max(temp2) < 0.92:  # 예상 확률이 85 ~ 92% 사이에 있을 때(재예측 알고리즘 가동)
