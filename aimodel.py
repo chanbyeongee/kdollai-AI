@@ -86,13 +86,11 @@ class AIModel:
 
         if self.state == "general":
             TypeOut = "General"
-            TypeScenario = None
             GeneralAnswer = [GD_predict(inputsentence, self.GC_model, self._mTokenizer)]
 
 
         else:  # 당혹, 죄책감, 슬픔, 연민, 걱정, 기쁨
             TypeOut = "Scenario"
-            TypeScenario = self.state
 
             if self.cnt == 2:
                 self.s_flag = False
@@ -325,7 +323,7 @@ class AIModel:
         # else:
         #     TypeOut = "General"
 
-        return GeneralAnswer, NER, EmoOut, topic, TypeOut, TypeScenario
+        return GeneralAnswer, NER, EmoOut, topic, TypeOut, None
 
 
 
