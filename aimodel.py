@@ -72,13 +72,12 @@ class AIModel:
             EmoOut = emo_predict(self.EMO_model, [inputsentence])
 
         if self.manage_dailogbuffer() is True:
-            (main_topic, sub_topic) = Topic_predict(self.Topic_model, dialogs, EmoOut)
+            topic = Topic_predict(self.Topic_model, dialogs, EmoOut)
         else:
-            main_topic = None
-            sub_topic = None
+            topic = None
 
         if self.cnt == 0 and EmoOut in ["당혹", "죄책감", "슬픔", "연민", "걱정", "기쁨", "불만", "질투"]:
-            if EmoOut == "슬픔" and main_topic == "가족":
+            if EmoOut == "슬픔" and topic == "가족":
                 self.state = "가족_슬픔"
             else:
                 self.state = EmoOut
@@ -327,7 +326,7 @@ class AIModel:
         # else:
         #     TypeOut = "General"
 
-        return GeneralAnswer, NER, EmoOut, main_topic, sub_topic, TypeOut, TypeScenario
+        return GeneralAnswer, NER, EmoOut, topic, TypeOut, TypeScenario
 
 
 
@@ -337,7 +336,7 @@ class AIModel:
         Data = OrderedDict()
         self.dialog_buffer.append(inputsentence)
 
-        GeneralAnswer, Name_Entity, Emotion, main_topic, sub_topic, TypeOut, Flag = self.get_results(name, inputsentence)
+        GeneralAnswer, Name_Entity, Emotion, topic, TypeOut, Flag = self.get_results(name, inputsentence)
 
         DangerFlag, Badwords = self.danger_detector.detect(inputsentence)
 
@@ -345,8 +344,7 @@ class AIModel:
         Data["Input_Corpus"] = inputsentence
         Data["NER"] = Name_Entity
         Data["Emotion"] = Emotion
-        Data["Topic"] = main_topic
-        Data["Sub_Topic"] = sub_topic
+        Data["Topic"] = topic
         Data["Type"] = TypeOut
         Data["System_Corpus"] = GeneralAnswer
         Data["Flag"] = Flag
