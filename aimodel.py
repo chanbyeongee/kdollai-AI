@@ -83,15 +83,17 @@ class AIModel:
                 self.state = EmoOut
             self.cnt = 1
             self.s_flag = True
-        print(self.state)
+
         if self.state == "general":
             TypeOut = "General"
+            TypeScenario = None
             GeneralAnswer = [GD_predict(inputsentence, self.GC_model, self._mTokenizer)]
 
 
         else:  # 당혹, 죄책감, 슬픔, 연민, 걱정, 기쁨
             TypeOut = "Scenario"
             TypeScenario = self.state
+
             if self.cnt == 2:
                 self.s_flag = False
 
@@ -110,8 +112,8 @@ class AIModel:
                     self.cnt += 1
 
                 elif self.cnt == 4:
-                    GeneralAnswer = ["나도 동현이 마음이 이해돼...",
-                                     "부모님께서 조금만 덜 싸우면 좋겠는데... 내가 위로해 주고 싶어",
+                    GeneralAnswer = ["나도 동현이 마음이 이해돼... "+
+                                     "부모님께서 조금만 덜 싸우면 좋겠는데... 내가 위로해 주고 싶어 "+
                                      "그일 때문에 많이 슬퍼보이는데 맞니?"]
                     self.cnt += 1
 
@@ -122,84 +124,84 @@ class AIModel:
                         self.cnt = 2
                         GeneralAnswer = self.get_results(name, inputsentence)[0]
                     else:
-                        GeneralAnswer  = ["내 감이 틀렸다니 다행이다, 그래도 내 도움이 필요하면 꼭 말해줘!",
+                        GeneralAnswer  = ["내 감이 틀렸다니 다행이다, 그래도 내 도움이 필요하면 꼭 말해줘! "+
                                           "항상 널 응원할게"]
                         self.cnt = 0
                         self.state = "general"
 
             elif self.state == "당혹":
                 if self.cnt == 1:
-                    GeneralAnswer = ["음.. 오늘 " + name + "에게 당황스러운 일이 있었나보구나..",
+                    GeneralAnswer = ["음.. 오늘 " + name + "에게 당황스러운 일이 있었나보구나.. "+
                                         "괜찮다면 어떤 일이 있었는지 물어봐도 되니?"]
                     self.cnt += 1
 
 
                 elif self.cnt == 2:
-                    GeneralAnswer = ["저런.. 내가 너였어도 많이 당황스러웠을 거 같아..",
-                                     "많이 놀랐을텐데 나에게 얘기해줘서 정말 고마워!",
+                    GeneralAnswer = ["저런.. 내가 너였어도 많이 당황스러웠을 거 같아.. "+
+                                     "많이 놀랐을텐데 나에게 얘기해줘서 정말 고마워! "+
                                      "이 얘기에 대해서 너랑 이야기를 더 해보고싶은데 괜찮을까?"]
                     self.cnt += 1
                 elif self.cnt == 3:
                     reaction = yes_no_predict(self.yes_no_model, inputsentence)
                     if reaction == "yes":
-                        GeneralAnswer = ["고마워! 얘기를 나누면서 내가 너에게 도움이 되었으면 좋겠다..",
+                        GeneralAnswer = ["고마워! 얘기를 나누면서 내가 너에게 도움이 되었으면 좋겠다.. "+
                                          "그 전에 너를 당황스럽게 한 그 상황에 대해 자세히 알고 싶은데.. 혹시 뭔지 알 수 있을까?"]
                         self.cnt += 1
                     else:
-                        GeneralAnswer = ["내가 너무 성급했나봐.. 너한테 너무 부담을 준 거 같아서 정말 미안해..",
-                                         "다음에라도 얘기해줄 수 있다면 언제든지 찾아와줘!",
+                        GeneralAnswer = ["내가 너무 성급했나봐.. 너한테 너무 부담을 준 거 같아서 정말 미안해.. "+
+                                         "다음에라도 얘기해줄 수 있다면 언제든지 찾아와줘! "+
                                          "그동안 더 많이 배워서 " + name + "한테 꼭 도움을 주고 싶어. 오늘 나랑 얘기해줘서 고마워!"]
                         self.cnt = 0
                         self.state = "general"
 
                 elif self.cnt == 4:
-                    GeneralAnswer = ["말해줘서 정말 고마워!",
-                                     "내가 알기로는, 사람이 당황스럽다고 느껴지는 상황을 마주하게 되면 크게 위축된다고 해.",
-                                     "아마 그런 상황 때문에 너가 침착하게 생각할 수 없었던 거 일지도 몰라.",
-                                     "나는 가끔 당황스러움에 생각이 많아질 때면 책상 정리를 하면서 감정으로부터 멀어지려고 해.",
-                                     "이게 내 나름대로 최악의 상황을 떠올리지 않게 하는 방법인 것 같아.",
+                    GeneralAnswer = ["말해줘서 정말 고마워! "+
+                                     "내가 알기로는, 사람이 당황스럽다고 느껴지는 상황을 마주하게 되면 크게 위축된다고 해. "+
+                                     "아마 그런 상황 때문에 너가 침착하게 생각할 수 없었던 거 일지도 몰라. "+
+                                     "나는 가끔 당황스러움에 생각이 많아질 때면 책상 정리를 하면서 감정으로부터 멀어지려고 해. "+
+                                     "이게 내 나름대로 최악의 상황을 떠올리지 않게 하는 방법인 것 같아. "+
                                      "너는 당황스러움을 벗어나기 위해서 어떤 걸 하니?"]
                     self.cnt += 1
                 elif self.cnt == 5:
-                    GeneralAnswer = ["오! 정말 좋은 방법인걸?",
-                                     "내가 너의 지친 마음이 괜찮아질 때까지 옆에서 계속 응원해줄게!",
+                    GeneralAnswer = ["오! 정말 좋은 방법인걸? "+
+                                     "내가 너의 지친 마음이 괜찮아질 때까지 옆에서 계속 응원해줄게! "+
                                      "내가 생각나면 언제는 나를 찾아줘! 다음에 또 보자!"]
                     self.cnt = 0
                     self.state = "general"
 
             elif self.state == "죄책감":
                 if self.cnt == 1:
-                    GeneralAnswer = ["가볍게 생각할 수 있지만 너가 지금 느끼는 감정은 어쩌면 너를 정말 힘들게 만들지도 몰라...",
+                    GeneralAnswer = ["가볍게 생각할 수 있지만 너가 지금 느끼는 감정은 어쩌면 너를 정말 힘들게 만들지도 몰라... "+
                                      "어째서 그렇게 생각한 건지 더 자세히 말해줄 수 있니?"]
                     self.cnt += 1
                 elif self.cnt == 2:
-                    GeneralAnswer = ["그렇구나... 말해줘서 정말 고마워..",
-                                    "보통 이런 상황에서는 내 편이 없다고 느끼기 쉽고, 실제로도 없어서 힘든 경우가 많은 걸로 알고 있어..",
+                    GeneralAnswer = ["그렇구나... 말해줘서 정말 고마워.. "+
+                                    "보통 이런 상황에서는 내 편이 없다고 느끼기 쉽고, 실제로도 없어서 힘든 경우가 많은 걸로 알고 있어.. "+
                                     "너는 지금 어떻니? 지금 혼자라는 생각이 드니?"]
                     self.cnt += 1
                 elif self.cnt == 3:
                     reaction = yes_no_predict(self.yes_no_model, inputsentence)
                     if reaction == "yes":
-                        GeneralAnswer = ["그렇구나.. 계속 혼자서 이런 상황을 버틴거구나...",
-                                         "너가 혼자 힘들게 버텼을 생각을 하니 나도 슬프다..",
+                        GeneralAnswer = ["그렇구나.. 계속 혼자서 이런 상황을 버틴거구나... "+
+                                         "너가 혼자 힘들게 버텼을 생각을 하니 나도 슬프다.. "+
                                          "그래도 너무 힘들어하지 않았으면 좋겠어.. 누군가한테 너는 정말 소중한 사람이라는 걸 잊지 말아줘."]
                     else:
-                        GeneralAnswer = ["휴.. 그래도 정말 다행이야..!",
-                                         "이런 힘든 상황에서 나를 지지해줄 사람이 있다는 건 정말이지 큰 힘이니까 말이야..",
+                        GeneralAnswer = ["휴.. 그래도 정말 다행이야..! "+
+                                         "이런 힘든 상황에서 나를 지지해줄 사람이 있다는 건 정말이지 큰 힘이니까 말이야.. "+
                                          "그래도 너무 힘들어하지 않았으면 좋겠어.. 누군가한테 너는 정말 소중한 사람이라는 걸 잊지 말아줘."]
                     self.cnt = 0
                     self.state = "general"
 
             elif self.state == "슬픔":
                 if self.cnt == 1:
-                    GeneralAnswer = ["음.. 이야기를 들으면서 느낀건데, 너 지금 많이 슬퍼하는 것 같어. 내 생각이 맞니?",
+                    GeneralAnswer = ["음.. 이야기를 들으면서 느낀건데, 너 지금 많이 슬퍼하는 것 같어. 내 생각이 맞니? "+
                                      "맞다면 무슨 일이 있던건지 더 자세히 말해줄래?"]
                     self.cnt += 1
                     print(self.cnt)
 
                 elif self.cnt == 2:
-                    GeneralAnswer = ["그랬구나.. 말해줘서 정말 고마워.",
-                                     "너가 슬퍼하는 것 같아서 나도 마음이 너무 아프다..",
+                    GeneralAnswer = ["그랬구나.. 말해줘서 정말 고마워. "+
+                                     "너가 슬퍼하는 것 같아서 나도 마음이 너무 아프다.. "+
                                      "혹시 슬픈 상황을 견디는 너만의 방법이 있니?"]
                     self.cnt += 1
 
@@ -207,14 +209,14 @@ class AIModel:
                     reaction = yes_no_predict(self.yes_no_model, inputsentence)
                     print(reaction)
                     if reaction == "yes":
-                        GeneralAnswer = ["오, 정말 다행이다.",
-                                         "슬픔을 너가 잘 조절할 수 있다면 그 슬픔으로 인해 오히려 너가 더 성장할 수 있다고 해.",
+                        GeneralAnswer = ["오, 정말 다행이다. "+
+                                         "슬픔을 너가 잘 조절할 수 있다면 그 슬픔으로 인해 오히려 너가 더 성장할 수 있다고 해. "+
                                          "그러니 앞으로도 슬픈 일이 있을 때 너만의 방법으로 잘 극복했으면 좋겠어. 다음에 또 봐!"]
 
                     else:
-                        GeneralAnswer = ["그렇구나..",
-                                         "그렇다면 노래를 한 번 들어보는 건 어떻니? 아이유 가수의 밤 편지라는 노래가 너에게 위로를 줄 것 같은데, 한 번 들어줬으면 좋겠어.",
-                                         "슬픈 일을 겪고 다시 일어나는 게 정말 힘든 일인건 맞아. 하지만 그러한 상황을 한 번이라도 극복할 수만 있다면 너는 더욱 성장할거야.",
+                        GeneralAnswer = ["그렇구나.. "+
+                                         "그렇다면 노래를 한 번 들어보는 건 어떻니? 아이유 가수의 밤 편지라는 노래가 너에게 위로를 줄 것 같은데, 한 번 들어줬으면 좋겠어. "+
+                                         "슬픈 일을 겪고 다시 일어나는 게 정말 힘든 일인건 맞아. 하지만 그러한 상황을 한 번이라도 극복할 수만 있다면 너는 더욱 성장할거야. "+
                                          "내가 추천해준 노래를 들으면서 너만의 슬픔을 극복하는 방법을 찾아보는 거 어떻니? 내가 너에게 도움이 되었으면 좋겠다. 아무튼, 긴 얘기 들어줘서 고마워! 다음에 또 봐!"]
                     self.cnt = 0
                     self.state = "general"
@@ -231,9 +233,9 @@ class AIModel:
                 elif self.cnt == 3:
                     reaction = yes_no_predict(self.yes_no_model, inputsentence)
                     if reaction == "yes":
-                        GeneralAnswer = ["나는 " + name + "이가 신경써주는게 정말 멋진 일인 것 같아. ",
-                                         "그 사람 이야기를 계속 들어주는 것만으로도 되게 큰 위로가 될거야! 그리고 예쁜 말해주고 안아주면 더 좋아할 걸?",
-                                         "근데 그래도 너무 스트레스 받아하지는 마. 그 사람이 힘들 수는 있지만 그게 " + name + "이 탓은 아니니까. 내 말 알겠지?",
+                        GeneralAnswer = ["나는 " + name + "이가 신경써주는게 정말 멋진 일인 것 같아. "+
+                                         "그 사람 이야기를 계속 들어주는 것만으로도 되게 큰 위로가 될거야! 그리고 예쁜 말해주고 안아주면 더 좋아할 걸? "+
+                                         "근데 그래도 너무 스트레스 받아하지는 마. 그 사람이 힘들 수는 있지만 그게 " + name + "이 탓은 아니니까. 내 말 알겠지? "+
                                          "같이 용기내보자! 내가 응원할게."]
                     else:
                         GeneralAnswer = ["그렇구나. 알겠어 다음에 얘기하고 싶으면 말해주라."]
@@ -253,8 +255,8 @@ class AIModel:
                 elif self.cnt == 3:
                     reaction = yes_no_predict(self.yes_no_model, inputsentence)
                     if reaction == "yes":
-                        GeneralAnswer = ["지금 " + name + "이가 느끼는게 지금은 많이 걱정스러운 것 처럼 보이지만 사실은 아닐 수도 있어.",
-                                         "별일 아니야. 괜찮아! 하다보면 정말 괜찮아지는게 대부분이다! 별거 아닌걸로 걱정했구나 하는 경우가 많대.",
+                        GeneralAnswer = ["지금 " + name + "이가 느끼는게 지금은 많이 걱정스러운 것 처럼 보이지만 사실은 아닐 수도 있어. "+
+                                         "별일 아니야. 괜찮아! 하다보면 정말 괜찮아지는게 대부분이다! 별거 아닌걸로 걱정했구나 하는 경우가 많대. "+
                                          "다 잘 될거야. 내가 옆에서 지켜줄게."]
                     else:
                         GeneralAnswer = ["그렇구나. 알겠어 다음에 얘기하고 싶으면 말해주라."]
@@ -267,7 +269,7 @@ class AIModel:
                     self.cnt += 1
 
                 elif self.cnt == 2:
-                    GeneralAnswer = ["그렇구나! 말해줘서 고마워. " + name + "이가 기분 좋아서 나도 좋다.",
+                    GeneralAnswer = ["그렇구나! 말해줘서 고마워. " + name + "이가 기분 좋아서 나도 좋다. "+
                                      "나도 " + name + "이한테 어떤 얘기 해주고 싶은데 들어볼래?"]
                     self.cnt += 1
                 elif self.cnt == 3:
@@ -281,15 +283,15 @@ class AIModel:
 
             elif self.state == "불만":
                 if self.cnt == 1:
-                    GeneralAnswer = [name + "이가 지금 화가 난 것 같네.",
+                    GeneralAnswer = [name + "이가 지금 화가 난 것 같네. "+
                                      "진정하고 내 얘기 좀 들어볼래?"]
                     self.cnt += 1
 
                 elif self.cnt == 2:
                     reaction = yes_no_predict(self.yes_no_model, inputsentence)
                     if reaction == "yes":
-                        GeneralAnswer = ["난 " + name + "이가 화낼 수 있다 생각해. 어떻게 사람이 맨날 참니? 하지만 화를 낼 때도 멋지게 화를 내야 해",
-                                         "울거나 화를 내지 말고 " + name + "이가 왜 불만이 생겼고, 앞으로 이렇게 해달라 분명하게 말하는게 중요해. 그러면 귀기울여 마음을 들어줄거야",
+                        GeneralAnswer = ["난 " + name + "이가 화낼 수 있다 생각해. 어떻게 사람이 맨날 참니? 하지만 화를 낼 때도 멋지게 화를 내야 해 "+
+                                         "울거나 화를 내지 말고 " + name + "이가 왜 불만이 생겼고, 앞으로 이렇게 해달라 분명하게 말하는게 중요해. 그러면 귀기울여 마음을 들어줄거야 "+
                                          "내가 " + name + "이를 응원할테니 한 번 용기를 내봐!"]
                     else:
                         GeneralAnswer = ["그렇구나. 알겠어 다음에 얘기하고 싶으면 말해주라."]
@@ -299,14 +301,14 @@ class AIModel:
 
             else:
                 if self.cnt == 1:
-                    GeneralAnswer = ["내 생각에는 지금 " + name + "이가 조금 질투를 하는거같아.",
+                    GeneralAnswer = ["내 생각에는 지금 " + name + "이가 조금 질투를 하는 거 같아."+
                                      "혹시 내 얘기를 들어볼래?"]
                 elif self.cnt == 2:
                     reaction = yes_no_predict(self.yes_no_model, inputsentence)
                     if reaction == "yes":
-                        GeneralAnswer = ["우리는 맨날 다른 사람을 비교하고 비교당하는 거 같아.",
-                                         "하지만 " + name + "이도 세상에서 하나밖에 없는 이쁜 아이니까 누군가를 질투하지 않아도 돼!",
-                                         "내가 " + name + "이가 누구보다 멋지다는 걸 기억하고 있을게!",
+                        GeneralAnswer = ["우리는 맨날 다른 사람을 비교하고 비교 당하는 거 같아."+
+                                         "하지만 " + name + "이도 세상에서 하나밖에 없는 이쁜 아이니까 누군가를 질투하지 않아도 돼!"+
+                                         "내가 " + name + "이가 누구보다 멋지다는 걸 기억하고 있을게!"+
                                          "다음에도 그런 마음이 들면 나한테 또 말해줘."]
                     else:
                         GeneralAnswer = ["그렇구나. 알겠어 다음에 얘기하고 싶으면 말해주라."]
