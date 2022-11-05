@@ -73,27 +73,30 @@ class AIModel:
 
         if self.manage_dailogbuffer() is True:
             (main_topic, sub_topic) = Topic_predict(self.Topic_model, dialogs, EmoOut)
-            print(dialogs)
         else:
             main_topic = None
             sub_topic = None
 
         if self.cnt == 0 and EmoOut in ["당혹", "죄책감", "슬픔", "연민", "걱정", "기쁨", "불만", "질투"]:
-            self.state = EmoOut
+            if EmoOut == "슬픔" and main_topic == "가족":
+                self.state = "가족_슬픔"
+            else:
+                self.state = EmoOut
             self.cnt = 1
             self.s_flag = True
-
+        print(self.state)
         if self.state == "general":
-            DialogType = "General"
-            GeneralAnswer = [GC_predict(inputsentence, self.GC_model, self._mTokenizer)]
+            TypeOut = "General"
+            GeneralAnswer = [GD_predict(inputsentence, self.GC_model, self._mTokenizer)]
 
 
         else:  # 당혹, 죄책감, 슬픔, 연민, 걱정, 기쁨
-            DialogType = "Scenario"
+            TypeOut = "Scenario"
+            TypeScenario = self.state
             if self.cnt == 2:
                 self.s_flag = False
 
-            if self.state == "슬픔" and main_topic == "가족":
+            if self.state == "가족_슬픔":
                 if self.cnt == 1:
                     GeneralAnswer = ["그래...? 부모님께서 싸우셨다고 말한거지?"]
                     self.cnt += 1
@@ -105,7 +108,7 @@ class AIModel:
 
                 elif self.cnt == 3:
                     GeneralAnswer = ["그럼 동현이는 부모님이 싸우는 걸 보면 어떤 생각이 들어?"]
-                    self.cnt +=1
+                    self.cnt += 1
 
                 elif self.cnt == 4:
                     GeneralAnswer = ["나도 동현이 마음이 이해돼...",
@@ -117,7 +120,8 @@ class AIModel:
                     reaction = yes_no_predict(self.yes_no_model, inputsentence)
                     if reaction == "yes":
                         self.state = "슬픔"
-                        self.cnt = 1
+                        self.cnt = 2
+                        GeneralAnswer = self.get_results(name, inputsentence)
                     else:
                         GeneralAnswer  = ["내 감이 틀렸다니 다행이다, 그래도 내 도움이 필요하면 꼭 말해줘!",
                                           "항상 널 응원할게"]
@@ -202,6 +206,7 @@ class AIModel:
 
                 elif self.cnt == 3:
                     reaction = yes_no_predict(self.yes_no_model, inputsentence)
+                    print(reaction)
                     if reaction == "yes":
                         GeneralAnswer = ["오, 정말 다행이다.",
                                          "슬픔을 너가 잘 조절할 수 있다면 그 슬픔으로 인해 오히려 너가 더 성장할 수 있다고 해.",
@@ -214,7 +219,6 @@ class AIModel:
                                          "내가 추천해준 노래를 들으면서 너만의 슬픔을 극복하는 방법을 찾아보는 거 어떻니? 내가 너에게 도움이 되었으면 좋겠다. 아무튼, 긴 얘기 들어줘서 고마워! 다음에 또 봐!"]
                     self.cnt = 0
                     self.state = "general"
-
 
             elif self.state == "연민":
                 if self.cnt == 1:
@@ -262,6 +266,7 @@ class AIModel:
                 if self.cnt == 1:
                     GeneralAnswer = ["지금 (name)이가 기분이 좋은 것 같네! 그 얘기 좀 더 자세히 해주라."]
                     self.cnt += 1
+
                 elif self.cnt == 2:
                     GeneralAnswer = ["그렇구나! 말해줘서 고마워. (name)이가 기분 좋아서 나도 좋다.",
                                      "나도 (name)이한테 어떤 얘기 해주고 싶은데 들어볼래?"]
@@ -317,26 +322,13 @@ class AIModel:
 
 
 
-        if main_topic in ["가족", "건강", "학교"]:
-            TypeOut = "Scenario"
-        else:
-            TypeOut = "General"
+        # if main_topic in ["가족", "건강", "학교"]:
+        #     TypeOut = "Scenario"
+        # else:
+        #     TypeOut = "General"
 
-        return GeneralAnswer, NER, EmoOut, main_topic, sub_topic, TypeOut
+        return GeneralAnswer, NER, EmoOut, main_topic, sub_topic, TypeOut, TypeScenario
 
-# 분석은 더미데이터로
-
-# 감정 시나리오
-# 6개 정도 가다가
-
-# 주제 시나리오
-#
-
-## 나 오늘 너무 슬퍼
-# 무슨일 있어?, 더 자세히말해줄래, 슬프겠다... 더 말해줄수있어?
-# 나 오늘 친구랑 싸웠어
-# 유저 인풋 3가지
-#
 
 
 ##광명님이 말하는 자료구조로 만들어주는 함수
@@ -345,7 +337,7 @@ class AIModel:
         Data = OrderedDict()
         self.dialog_buffer.append(inputsentence)
 
-        GeneralAnswer, Name_Entity, Emotion, main_topic, sub_topic, TypeOut = self.get_results(name, inputsentence)
+        GeneralAnswer, Name_Entity, Emotion, main_topic, sub_topic, TypeOut, Flag = self.get_results(name, inputsentence)
 
         DangerFlag, Badwords = self.danger_detector.detect(inputsentence)
 
@@ -357,6 +349,7 @@ class AIModel:
         Data["Sub_Topic"] = sub_topic
         Data["Type"] = TypeOut
         Data["System_Corpus"] = GeneralAnswer
+        Data["Flag"] = Flag
         Data["Danger_Flag"] = DangerFlag
         Data["Danger_Words"] = Badwords
 
