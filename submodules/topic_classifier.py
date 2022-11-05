@@ -112,6 +112,25 @@ def Topic_predict(LDA_model, sentences, EmoOut):
     prob = np.max(temp2)
     if np.max(temp2) < 0.85:  # 예상 확률이 85% 미만일 때
         return None, None
+
+    else:  # 예상 확률이 99% 이상일 경우, 재예측 X(크게 확신하므로)
+        if (topic_num == 4) or (topic_num == 5) or (topic_num == 8):  # 취미로 판정
+            index, prob = Hobby_predict(LDA_model, key_list)
+        elif (topic_num == 3) or (topic_num == 7):
+            index, prob = Media_predict(LDA_model, key_list)
+        elif topic_num == 1:
+            index, prob = Family_Health_predict(LDA_model, key_list)
+        else:
+            index = topic_index_dict[topic_num]
+
+        if prob > 0.9:
+            main_topic = main_topic_label[index]
+            sub_topic = sub_topic_label[index]
+            return main_topic, sub_topic
+        else:
+            return None, None
+
+"""
     elif np.max(temp2) < 0.92:  # 예상 확률이 85 ~ 92% 사이에 있을 때(재예측 알고리즘 가동)
         if EmoOut == "중립" or EmoOut == "기쁨" or EmoOut is None:
             if (topic_num == 4) or (topic_num == 5) or (topic_num == 8):  # 취미로 판정될 경우
@@ -143,23 +162,7 @@ def Topic_predict(LDA_model, sentences, EmoOut):
                 sub_topic = sub_topic_label[index]
                 return main_topic, sub_topic
             else:
-                return None, None
-    else:  # 예상 확률이 99% 이상일 경우, 재예측 X(크게 확신하므로)
-        if (topic_num == 4) or (topic_num == 5) or (topic_num == 8):  # 취미로 판정
-            index, prob = Hobby_predict(LDA_model, key_list)
-        elif (topic_num == 3) or (topic_num == 7):
-            index, prob = Media_predict(LDA_model, key_list)
-        elif topic_num == 1:
-            index, prob = Family_Health_predict(LDA_model, key_list)
-        else:
-            index = topic_index_dict[topic_num]
-
-        if prob > 0.9:
-            main_topic = main_topic_label[index]
-            sub_topic = sub_topic_label[index]
-            return main_topic, sub_topic
-        else:
-            return None, None
+                return None, None"""
 
 def load_Topic_model():
     print("########Loading THE model!!!########")
