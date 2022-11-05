@@ -36,6 +36,11 @@ class AIModel:
     def __init__(self):
         self.get_converters()
         self.dialog_buffer = []
+        self.model_loader()
+        emo_predict(self.EMO_model, ["안녕"])
+        Topic_predict(self.Topic_model, "안녕", "기쁨")
+        ner_predict(self.NER_model, "[안녕]")
+        GD_predict("안녕", self.GC_model, self._mTokenizer)
 
     def get_converters(self):
         self._mTokenizer = mTokenizer
@@ -354,7 +359,6 @@ if __name__ == "__main__":
 
     DoDam = AIModel()
 
-    DoDam.model_loader()
 
     UserName = "민채"
 
