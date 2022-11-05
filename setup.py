@@ -70,6 +70,7 @@ def download_weights():
         output = weight_path + "/NER_weights/NER_weights.data-00000-of-00001"
         gdown.download(loaded["NER-data-url"], output, quiet=False)
 
+
 ###############################################################################################
 
     if not os.path.exists(weight_path + "/GeneralDialog_weights"):

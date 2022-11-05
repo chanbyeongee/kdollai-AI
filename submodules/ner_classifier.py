@@ -8,11 +8,13 @@ from transformers import TFBertModel
 import tensorflow as tf
 
 mNER_tokenizer = pickle.load(open(os.environ['CHATBOT_ROOT'] + "/resources/converters/letter_to_index.pickle", 'rb'))
-index_mapping_by_NER = {'O': 0, 'B-LC': 1, 'I-LC': 2, 'B-QT': 3, 'I-QT': 4, 'B-OG': 5, 'I-OG': 6, 'B-DT': 7, 'I-DT': 8, 
+index_mapping_by_NER = {'O': 0, 'B-LC': 1, 'I-LC': 2, 'B-QT': 3, 'I-QT': 4, 'B-OG': 5, 'I-OG': 6, 'B-DT': 7, 'I-DT': 8,
                         'B-PS': 9, 'I-PS': 10, 'B-TI': 11, 'I-TI': 12}
-NER_mapping_by_index = {0 : '0', 1 : 'B-LC', 2 : 'I-LC', 3 : 'B-QT', 4 : 'I-QT', 5 : 'B-OG', 6 : 'I-OG', 7 : 'B-DT', 
-                        8 : 'I-DT', 9 : 'B-PS', 10 : 'I-PS', 11 : 'B-TI', 12 : 'I-TI', 13 : 'UNK'}
+NER_mapping_by_index = {0: '0', 1: 'B-LC', 2: 'I-LC', 3: 'B-QT', 4: 'I-QT', 5: 'B-OG', 6: 'I-OG', 7: 'B-DT',
+                        8: 'I-DT', 9: 'B-PS', 10: 'I-PS', 11: 'B-TI', 12: 'I-TI', 13: 'UNK'}
 NER_labels = dict((value, key) for (key, value) in NER_mapping_by_index.items())
+
+
 # except Exception as error:
 #     pass
 
@@ -20,9 +22,10 @@ def load_NER_model():
     print("########Loading NER model!!!########")
     tag_size = len(NER_labels)
     new_model = NERBertModel("klue/bert-base", labels=tag_size)
-    new_model.load_weights(os.environ['CHATBOT_ROOT']+"/resources/weights/NER_weights/NER_weights")
+    new_model.load_weights(os.environ['CHATBOT_ROOT'] + "/resources/weights/NER_weights/NER_weights")
 
     return new_model
+
 
 class NERBertModel(tf.keras.Model):
     def __init__(self, model_name, labels):
@@ -56,7 +59,7 @@ def ner_predict(model, inputs, max_len=128):
     # 128 x 29 차원의 원핫 인코딩 형태로 확률 예측값이 나오므로 최댓값만을 뽑아내 128차원 벡터로 변환
     y_predicted = np.argmax(raw_outputs, axis=-1)
     #### 감정에도 적용가능할듯
-    
+
     LC, QT, OG, DT, PS, TI = "", "", "", "", "", ""
 
     result_list = []
@@ -66,51 +69,51 @@ def ner_predict(model, inputs, max_len=128):
     for i in range(len(inputs)):
         if y_predicted[0][i] == 1:
             LC = inputs[i]
-            while y_predicted[0][i+1] == 2:
-                LC += inputs[i+1]
+            while y_predicted[0][i + 1] == 2:
+                LC += inputs[i + 1]
                 i += 1
             if LC not in result_list: result_list.append(("LC", LC))
             LC = ""
         elif y_predicted[0][i] == 3:
             QT = inputs[i]
-            while y_predicted[0][i+1] == 4:
-                QT += inputs[i+1]
+            while y_predicted[0][i + 1] == 4:
+                QT += inputs[i + 1]
                 i += 1
             if QT not in result_list: result_list.append(("QT", QT))
             QT = ""
         elif y_predicted[0][i] == 5:
             OG = inputs[i]
-            while y_predicted[0][i+1] == 6:
-                OG += inputs[i+1]
+            while y_predicted[0][i + 1] == 6:
+                OG += inputs[i + 1]
                 i += 1
             if OG not in result_list: result_list.append(("OG", OG))
             OG = ""
         elif y_predicted[0][i] == 7:
             DT = inputs[i]
-            while y_predicted[0][i+1] == 8:
-                DT += inputs[i+1]
+            while y_predicted[0][i + 1] == 8:
+                DT += inputs[i + 1]
                 i += 1
             if DT not in result_list: result_list.append(("DT", DT))
             DT = ""
         elif y_predicted[0][i] == 9:
             PS = inputs[i]
-            while y_predicted[0][i+1] == 10:
-                PS += inputs[i+1]
+            while y_predicted[0][i + 1] == 10:
+                PS += inputs[i + 1]
                 i += 1
             if PS not in result_list: result_list.append(("PS", PS))
             PS = ""
         elif y_predicted[0][i] == 11:
             TI = inputs[i]
-            while y_predicted[0][i+1] == 12:
-                TI += inputs[i+1]
+            while y_predicted[0][i + 1] == 12:
+                TI += inputs[i + 1]
                 i += 1
             if TI not in result_list: result_list.append(("TI", TI))
             TI = ""
 
     return result_list
 
-def ner_make_datasets(sentences, max_len, tokenizer):
 
+def ner_make_datasets(sentences, max_len, tokenizer):
     cls_index = tokenizer['[CLS]']
     sep_index = tokenizer['[SEP]']
 
@@ -139,6 +142,7 @@ def ner_make_datasets(sentences, max_len, tokenizer):
 
     return (input_ids, attention_masks, token_type_ids)
 
+
 def encode_to_integer_input(sentence):
     inputdata = []
 
@@ -151,6 +155,7 @@ def encode_to_integer_input(sentence):
         inputdata.append(encoded_input)
 
     return inputdata
+
 
 def encode_to_integer_target(sentences, max_len):
     targetdata = []
