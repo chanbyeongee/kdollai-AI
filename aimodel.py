@@ -120,7 +120,7 @@ class AIModel:
                     if reaction == "yes":
                         self.state = "슬픔"
                         self.cnt = 2
-                        GeneralAnswer = self.get_results(name, inputsentence)
+                        GeneralAnswer = self.get_results(name, inputsentence)[0]
                     else:
                         GeneralAnswer  = ["내 감이 틀렸다니 다행이다, 그래도 내 도움이 필요하면 꼭 말해줘!",
                                           "항상 널 응원할게"]
