@@ -70,6 +70,7 @@ def download_weights():
         output = weight_path + "/NER_weights/NER_weights.data-00000-of-00001"
         gdown.download(loaded["NER-data-url"], output, quiet=False)
 
+
 ###############################################################################################
 
     if not os.path.exists(weight_path + "/GeneralDialog_weights"):
@@ -92,11 +93,21 @@ def download_weights():
         with ZipFile(weight_path + "/Topic_weights/Main_topic.zip", "r") as z:
             z.extractall(weight_path + "/Topic_weights")
 
-    if not os.path.isfile(weight_path + "/Topic_weightss/Sub_topic.zip") or TOPIC_flag:
+    if not os.path.isfile(weight_path + "/Topic_weights/Sub_topic.zip") or TOPIC_flag:
         print("Downloading Transformer pretrained index...")
         output = weight_path + "/Topic_weights/Sub_topic.zip"
         gdown.download(loaded["Sub-model-url"], output, quiet=False)
         with ZipFile(weight_path + "/Topic_weights/Sub_topic.zip", "r") as z:
             z.extractall(weight_path + "/Topic_weights")
+
+    ###############################################################################################
+
+    if not os.path.exists(weight_path + "/Yes_no_weights"):
+        os.makedirs(weight_path + "/Yes_no_weights")
+
+    if not os.path.isfile(weight_path + "/Yes_no_weights/yes_no_weights.h5"):
+        print("Downloading Yes_no_weights pretrained index...")
+        output = weight_path + "/Yes_no_weights/Yes_no_weights.h5"
+        gdown.download(loaded["Yes-no-h5-url"], output, quiet=False)
 
     print("Setup has just overed!")

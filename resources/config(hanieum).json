@@ -2,7 +2,7 @@
 	"EMO-weights-version":"1.0.0",
 	"NER-weights-version":"1.0.0",
 	"SUB-weights-version":"1.0.0",
-	"GD-weights-version":"1.0.0",
+	"GD-weights-version":"1.0.1",
 	"TOPIC-weights-version":"1.0.0",
 	
 	"EMO-index-url":"https://drive.google.com/u/0/uc?id=1nSVbVcS75vc4Kf3XKOaXhLHMWlruvq95&export=download",
@@ -20,5 +20,6 @@
 	"Main-model-url":"https://drive.google.com/u/0/uc?id=1TKJLDn6ZAL7I0uLmLtMDd1n0UcCF8-Kr",
 	"Sub-model-url":"https://drive.google.com/u/0/uc?id=10NvRL-lc1dwJrcoBZCHywa98PjuH0ZK2",
 	
-	"GD-h5-url" : "https://drive.google.com/u/0/uc?id=1lJSRAh3lYeoKJxZvCFsLcEUQWYztftzS"
+	"GD-h5-url" : "https://drive.google.com/u/0/uc?id=1_7ysTYVeHNKkLB6oAFEfevdnKjRfyD8h",
+	"Yes-no-h5-url" : "https://drive.google.com/u/0/uc?id=1F_FRTbhwpwJUyv-DQ6i9dsQMxvfUth9C"
 }
